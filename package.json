@@ -1,0 +1,14 @@
+{
+  "name": "foodwreks",
+  "version": "0.1.0",
+  "description": "Find the best nearby restaurant by aggregating Google, Yelp, Tripadvisor and OpenStreetMap, then spin a wheel to pick.",
+  "type": "module",
+  "private": true,
+  "engines": { "node": ">=20.12" },
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "demo": "FOODWREKS_DEMO=1 node server.js",
+    "test": "node --test"
+  }
+}

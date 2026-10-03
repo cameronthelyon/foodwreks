@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FoodWreks</title>
+  <meta name="description" content="Aggregate restaurant reviews near you and spin the wheel to decide.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎡</text></svg>">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo" aria-hidden="true">🎡</span>
+      <h1>FoodWreks</h1>
+      <span id="demo-badge" class="badge demo" hidden>Demo data</span>
+    </div>
+    <form id="location-form" class="location" autocomplete="off">
+      <button type="button" id="locate-btn" class="btn primary">📍 Use my location</button>
+      <span class="or">or</span>
+      <input id="address-input" type="search" placeholder="Address, city or ZIP" aria-label="Search a location">
+      <button type="submit" class="btn">Go</button>
+    </form>
+  </header>
+
+  <div id="status" class="status" role="status" aria-live="polite"></div>
+  <div id="sources" class="sources" aria-label="Data sources"></div>
+
+  <main class="layout">
+    <aside class="filters" aria-label="Filters">
+      <details id="filters-box" open>
+      <summary>Filters</summary>
+      <div class="filters-body">
+      <section>
+        <h2>Distance</h2>
+        <label class="row">
+          <input id="radius" type="range" min="500" max="16000" step="500" value="3000">
+          <output id="radius-out">1.9 mi</output>
+        </label>
+        <p class="hint">Changing distance re-runs the search.</p>
+      </section>
+
+      <section>
+        <h2>Price</h2>
+        <div class="seg" id="price">
+          <button type="button" data-price="1" aria-pressed="false">$</button>
+          <button type="button" data-price="2" aria-pressed="false">$$</button>
+          <button type="button" data-price="3" aria-pressed="false">$$$</button>
+          <button type="button" data-price="4" aria-pressed="false">$$$$</button>
+        </div>
+        <label class="check"><input type="checkbox" id="include-unpriced" checked> Include places with no price info</label>
+      </section>
+
+      <section>
+        <h2>Quality</h2>
+        <label class="field">Minimum score
+          <select id="min-score">
+            <option value="0">Any</option>
+            <option value="3.5">3.5+</option>
+            <option value="4">4.0+</option>
+            <option value="4.3">4.3+</option>
+            <option value="4.5">4.5+</option>
+          </select>
+        </label>
+        <label class="field">Minimum reviews (all sources)
+          <select id="min-reviews">
+            <option value="0">Any</option>
+            <option value="25">25+</option>
+            <option value="100">100+</option>
+            <option value="500">500+</option>
+            <option value="1000">1,000+</option>
+          </select>
+        </label>
+        <label class="field">Minimum rated sources
+          <select id="min-sources">
+            <option value="0">Any</option>
+            <option value="2">2+</option>
+            <option value="3">3+</option>
+          </select>
+        </label>
+        <label class="check"><input type="checkbox" id="include-unrated"> Include unrated places</label>
+        <label class="check"><input type="checkbox" id="hide-mixed"> Hide mixed reviews</label>
+        <label class="check"><input type="checkbox" id="gems-only"> Hidden gems only</label>
+      </section>
+
+      <section>
+        <h2>Availability</h2>
+        <label class="check"><input type="checkbox" id="open-now"> Open now (drops unknown hours)</label>
+      </section>
+
+      <section>
+        <div class="section-head">
+          <h2>Cuisine</h2>
+          <button type="button" class="link" id="clear-cuisines">Clear</button>
+        </div>
+        <div id="cuisines" class="chips"></div>
+        <label class="check"><input type="checkbox" id="exclude-mode"> Exclude selected instead</label>
+      </section>
+
+      <section>
+        <h2>Sort</h2>
+        <select id="sort" aria-label="Sort results">
+          <option value="score">Best overall</option>
+          <option value="distance">Closest</option>
+          <option value="reviews">Most reviewed</option>
+          <option value="price-asc">Cheapest</option>
+        </select>
+      </section>
+
+      <button type="button" id="reset" class="btn ghost wide">Reset filters</button>
+      </div>
+      </details>
+    </aside>
+
+    <section class="results" aria-label="Results">
+      <div class="results-head">
+        <h2 id="results-title">Results</h2>
+        <span id="results-count" class="muted"></span>
+      </div>
+      <ol id="list" class="list"></ol>
+      <div id="empty" class="empty" hidden></div>
+    </section>
+
+    <section class="wheel-panel" aria-label="Wheel">
+      <div class="wheel-wrap">
+        <div class="pointer" aria-hidden="true"></div>
+        <canvas id="wheel" width="520" height="520" aria-label="Restaurant wheel"></canvas>
+        <button type="button" id="spin" class="spin" disabled>SPIN</button>
+      </div>
+      <div class="wheel-controls">
+        <label class="row">On the wheel: top
+          <input id="wheel-size" type="number" min="2" max="16" value="8">
+        </label>
+        <label class="check"><input type="checkbox" id="weighted" checked> Weight slices by score</label>
+        <p class="hint" id="wheel-hint">Uses the top results from your filters. Pin restaurants with ★ to hand-pick instead.</p>
+        <div class="row gap">
+          <button type="button" id="clear-pins" class="btn ghost small" hidden>Clear pins</button>
+          <button type="button" id="clear-vetoes" class="btn ghost small" hidden>Restore vetoed</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <dialog id="winner" class="winner">
+    <form method="dialog">
+      <p class="eyebrow">The wheel has spoken</p>
+      <h2 id="winner-name"></h2>
+      <p id="winner-meta" class="muted"></p>
+      <div id="winner-sources" class="src-row"></div>
+      <div class="actions">
+        <a id="winner-directions" class="btn primary" target="_blank" rel="noopener">Directions</a>
+        <button type="button" id="winner-veto" class="btn">Veto &amp; respin</button>
+        <button value="close" class="btn ghost">Close</button>
+      </div>
+    </form>
+  </dialog>
+
+  <footer class="foot muted">
+    Scores blend ratings from every source that knows a place, weighted by review count and adjusted toward the local average.
+    <a href="https://github.com/cameronthelyon/foodwreks#how-scoring-works" target="_blank" rel="noopener">How scoring works</a>
+  </footer>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
