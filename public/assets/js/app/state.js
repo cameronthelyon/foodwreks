@@ -52,6 +52,7 @@ export const SOURCE = {
   website: 'Website',
   google: 'Google',
   instagram: 'Instagram',
+  agent: 'AI assistant',
   phone: 'Phone',
   walkin: 'Walk-in',
   staff: 'Staff',

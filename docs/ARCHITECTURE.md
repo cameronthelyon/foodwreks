@@ -26,6 +26,8 @@ lib/
   notify/                 outbox, templates, providers (Postmark, Resend, Twilio)
   integrations/           Square, Clover, Toast (read-only), check matching, Stripe
   google.js               Actions Center booking server (v3), feeds, booking notifications
+  public-booking.js       booking rules shared by the booking page API and the agent server
+  mcp.js                  AI agent server (Model Context Protocol over HTTP) at /mcp
   portability.js          CSV import with column detection; CSV/JSON export
   reports.js              aggregates; unresolved bookings reported, never guessed
   license.js              trial, lifetime, comped, suspended
@@ -99,7 +101,7 @@ All idempotent and safe to run late or twice.
 
 ## Testing
 
-`npm test` runs 94 tests in under 4 seconds: the availability engine (DST, overlap, pacing, combos, repack, spillover), every HTTP flow (booking, manage, staff, roles, isolation, CSRF), imports and exports, reports, notifications (providers, retries, reminders), integrations (Stripe, Toast, Square, Clover, Google) with every outbound call faked, and page rendering. Tests use a fake clock, an in-memory database, and a recorded fake `fetch`. No test touches the network. `test/regressions.test.js` holds one test per bug found in review, each shown to fail before its fix.
+`npm test` runs 99 tests in under 4 seconds: the availability engine (DST, overlap, pacing, combos, repack, spillover), every HTTP flow (booking, manage, staff, roles, isolation, CSRF), imports and exports, reports, notifications (providers, retries, reminders), integrations (Stripe, Toast, Square, Clover, Google) with every outbound call faked, and page rendering. Tests use a fake clock, an in-memory database, and a recorded fake `fetch`. No test touches the network. `test/regressions.test.js` holds one test per bug found in review, each shown to fail before its fix.
 
 ## Known limits
 

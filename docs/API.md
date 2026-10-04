@@ -90,6 +90,17 @@ Changes and cancellations close at the restaurant's cutoff (`409 too_late`); aft
 
 `POST /api/public/r/{slug}/waitlist` with `{ "name", "partySize", "phone" }` returns `{ "id", "statusUrl", "quotedMin" }`. `GET /api/public/w/{id}?t={token}` returns position and status.
 
+## 6. AI agents (MCP)
+
+The same booking rules are available as a Model Context Protocol server, so any MCP-capable assistant (Claude, ChatGPT, or an agent framework) can book member restaurants.
+
+- **Endpoint:** `POST {BASE_URL}/mcp`, Streamable HTTP transport, stateless, JSON responses. No sign-in: it exposes only what the public booking page already does.
+- **Tools:** `search_restaurants`, `get_restaurant`, `check_availability`, `book_table`, `get_booking`, `change_booking`, `cancel_booking`. A booking returns a private `manage_url`; changing and cancelling require it, exactly like the guest's confirmation link.
+- **Same rules as the booking page:** party limits, notice, pacing, one active booking per person per restaurant per day, card holds (the agent gets a `checkout_url` to hand to the person), rate limits (bookings: 12 per 10 minutes per IP).
+- **Reports:** agent bookings are tagged "AI assistant," so each restaurant sees the channel.
+- **Free.** There is no fee per agent booking, ever: that would be a per-cover toll under another name.
+- **Add it to Claude:** Settings → Connectors → Add custom connector → `https://freeheld.io/mcp`. Other clients: point their remote MCP server setting at the same address.
+
 ## Discovery
 
 Every booking page (`/r/{slug}`) carries schema.org `Restaurant` data with a `ReserveAction`, so crawlers and agents can find the booking entry point from the restaurant's page.
