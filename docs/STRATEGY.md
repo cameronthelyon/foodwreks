@@ -80,7 +80,7 @@ Methods are flexible. The identity is not.
 
 1. **Diners search Google Maps.** The highest-leverage feature is a Reserve button on Google that costs nothing per cover. It ships day one (it is just a link).
 2. **Restaurants already export their guest lists.** The switching cost is a CSV. The importer maps OpenTable, Resy and spreadsheet columns automatically and never messages guests.
-3. **Owners trust other owners, not ads.** Every confirmation email carries a small "Booked with Freehold" footer, and diners include restaurant owners.
+3. **Owners trust other owners, not ads.** Every confirmation email carries a small "Booked with Freeheld" footer, and diners include restaurant owners.
 4. **The money argument settles itself.** The landing page has a payback calculator. The reports page shows each restaurant the covers it got from Google and Instagram, the ones OpenTable would have tolled.
 
 ---
@@ -164,7 +164,7 @@ Methods are flexible. The identity is not.
 | # | Rock | Done means |
 |---|---|---|
 | 1 | Five pilot restaurants live | Cut over from OpenTable or Resy using the checklist; two full services each without the old system |
-| 2 | Cooperative formed | Counsel engaged; articles and bylaws filed with the asset lock; member share terms reviewed for securities questions; trademark search on Freehold; freehold.coop registered |
+| 2 | Cooperative formed | Counsel engaged; articles and bylaws filed with the asset lock; member share terms reviewed for securities questions; trademark search on Freeheld; freeheld.io live (freeheld.coop once the co-op exists) |
 | 3 | Production ready | Deployed with backups and a tested restore; Postmark live; toll-free texting verified for pilots |
 | 4 | Google channel live | Every pilot has the GBP reservation link; Actions Center interest form submitted |
 | 5 | One POS validated | Toast Standard API access tested against a pilot's real data |

@@ -6,7 +6,7 @@ import { signup, startTestApp } from './helpers.js';
 
 let t;
 before(async () => {
-  t = await startTestApp({ env: { BRAND_NAME: 'Freehold' } });
+  t = await startTestApp({ env: { BRAND_NAME: 'Freeheld' } });
 });
 after(() => t.close());
 
@@ -17,7 +17,7 @@ test('landing, auth and app shells render with the brand', async () => {
     const res = await get(path);
     assert.equal(res.status, 200, path);
     const html = await res.text();
-    assert.ok(html.includes('Freehold'), path);
+    assert.ok(html.includes('Freeheld'), path);
     assert.ok(!html.includes('{{'), `${path} has no unfilled placeholders`);
   }
   assert.match(await (await get('/')).text(), /Own the book\./);
@@ -65,4 +65,19 @@ test('every user-facing page links to the source, as the AGPL requires', async (
   for (const path of ['/', `/r/${slug}`, '/app']) {
     assert.ok((await (await get(path)).text()).includes(source), path);
   }
+});
+
+test('search engines can find and read every bookable restaurant', async () => {
+  const { rid, slug, restaurant } = await signup(t, { restaurantName: 'Crawl & Co' });
+  const html = await (await get(`/r/${slug}`)).text();
+  assert.match(html, /<h1 id="r-name">Crawl &amp; Co<\/h1>/, 'name is in the HTML, not only added by script');
+  const robots = await (await get('/robots.txt')).text();
+  assert.match(robots, /Sitemap: http:\/\/localhost\/sitemap\.xml/);
+  const sitemap = await (await get('/sitemap.xml')).text();
+  assert.ok(sitemap.includes(`<loc>http://localhost/r/${slug}</loc>`));
+  // Switched off: dropped from the sitemap.
+  t.app.db.run('UPDATE restaurants SET online_booking = 0 WHERE id = ?', rid);
+  assert.ok(!(await (await get('/sitemap.xml')).text()).includes(`/r/${slug}<`));
+  // The website snippet starts with a real link to the booking page.
+  assert.match(restaurant.links.widget, new RegExp(`^<a href="http://localhost/r/${slug}" data-freeheld-widget>Reserve a table at Crawl &amp; Co</a>`));
 });

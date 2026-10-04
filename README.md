@@ -1,4 +1,4 @@
-# Freehold
+# Freeheld
 
 **Own the book.** A reservation system for independent restaurants. Pay $1,000 once per location. No cover fees, no monthly rent, and your guests and data stay yours.
 
@@ -16,8 +16,8 @@ Open http://localhost:3000. A demo restaurant (Juniper & Rye) loads with a month
 |---|---|
 | Marketing page | http://localhost:3000 |
 | Diner booking page | http://localhost:3000/r/juniper-rye |
-| Host stand | http://localhost:3000/login as `demo@freehold.test` / `freehold-demo` |
-| Host-only account | `host@freehold.test` / `freehold-demo` |
+| Host stand | http://localhost:3000/login as `demo@freeheld.test` / `freeheld-demo` |
+| Host-only account | `host@freeheld.test` / `freeheld-demo` |
 | Platform admin | http://localhost:3000/admin (the demo owner is an admin) |
 
 Emails print to the terminal in demo mode instead of sending.
@@ -58,10 +58,10 @@ Production deployment, backups, restore drills, onboarding and cutover checklist
 
 ## Status: what is and is not proven
 
-- **Proven by tests:** the availability engine, every booking and host-stand flow, roles and tenant isolation, imports and exports, reports, notifications, and the integration request shapes. `npm test` runs 88 tests in under 4 seconds.
+- **Proven by tests:** the availability engine, every booking and host-stand flow, roles and tenant isolation, imports and exports, reports, notifications, and the integration request shapes. `npm test` runs 89 tests in under 4 seconds.
 - **Driven in a real browser:** booking, manage, host stand, floor drag-and-drop, waitlist, guests, settings, import.
 - **Not yet proven:** no integration has run against a live sandbox (Toast, Square, Clover, Stripe, Google, Postmark, Twilio). Budget a day each before a pilot depends on one. Google booking-inside-Google needs Google's partner approval.
-- **Decided:** AGPL-3.0 license; operated as a cooperative owned by member restaurants (see STRATEGY.md). **Still open:** trademark search and domains (see BRAND.md).
+- **Decided:** the name Freeheld on freeheld.io; AGPL-3.0 license; operated as a cooperative owned by member restaurants (see STRATEGY.md and BRAND.md). **Still open:** trademark search.
 
 ## Develop
 
@@ -75,6 +75,6 @@ Code layout and conventions: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 ## License
 
-Copyright 2026 the Freehold authors (to be assigned to the cooperative when it is formed).
+Copyright 2026 the Freeheld authors (to be assigned to the cooperative when it is formed).
 
-Freehold is free software under the [GNU Affero General Public License v3.0](LICENSE) (`AGPL-3.0-only`). If you run a modified version as a service, you must offer your users its source. Every page links to the source at `SOURCE_URL`; point it at a public repository of the exact code you run.
+Freeheld is free software under the [GNU Affero General Public License v3.0](LICENSE) (`AGPL-3.0-only`). If you run a modified version as a service, you must offer your users its source. Every page links to the source at `SOURCE_URL`; point it at a public repository of the exact code you run.

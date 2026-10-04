@@ -1,5 +1,5 @@
 {
-  "name": "freehold",
+  "name": "freeheld",
   "version": "0.1.0",
   "description": "Pay-once reservation system for independent restaurants. No cover fees, no monthly rent, your guests stay yours.",
   "type": "module",
@@ -11,7 +11,7 @@
   "scripts": {
     "start": "node --disable-warning=ExperimentalWarning server.js",
     "dev": "node --disable-warning=ExperimentalWarning --watch server.js",
-    "demo": "FREEHOLD_DEMO=1 node --disable-warning=ExperimentalWarning server.js",
+    "demo": "FREEHELD_DEMO=1 node --disable-warning=ExperimentalWarning server.js",
     "seed": "node --disable-warning=ExperimentalWarning scripts/seed-demo.js",
     "test": "node --disable-warning=ExperimentalWarning --test test/*.test.js"
   }

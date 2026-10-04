@@ -815,7 +815,7 @@ function share(el) {
     panel('Instagram bio', h('p', { class: 'small' }, 'Tracked as Instagram in reports.'), snippet(l.instagram)),
     panel(
       'Website button',
-      h('p', { class: 'small' }, 'Paste where the button should appear. It opens the booking form over your page. Bookings are tracked as Website.'),
+      h('p', { class: 'small' }, 'Paste where the button should appear. It opens the booking form over your page, still works if scripts are blocked, and is a link search engines follow to your booking page. Bookings are tracked as Website.'),
       snippet(l.widget),
       h('p', { class: 'small' }, 'Or show the full form inline on a reservations page:'),
       snippet(inline),

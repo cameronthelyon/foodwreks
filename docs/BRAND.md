@@ -1,16 +1,12 @@
 # Brand
 
-## Recommendation
+## Decision
 
-**Name: Freehold.** Tagline: **Own the book.** Value line: **Pay once. No cover fees. No rent.**
+**Name: Freeheld.** Domain: **freeheld.io**. Tagline: **Own the book.** Value line: **Pay once. No cover fees. No rent.**
 
-*Freehold* earns its place three ways at once, all on message:
-
-- **Freehold** is property you own outright, the opposite of a leasehold you rent forever. That is the whole pitch against SaaS rent.
-- **Hold** is what a reservation *is*. "We'll hold the table for you."
-- **Free** is what a cover costs.
-
-"Own the book" is the hedgehog in four syllables. Restaurant staff call the reservation system "the book," and owning it is the point.
+- **Held** is what a reservation is, already done: your table, held. **Free** is what each cover costs.
+- It keeps the sound and rhythm of "freehold" (property you own outright) without the New Jersey search noise, and the .com problem is moot because discovery runs through search and links, not typing.
+- What it gives up: "freehold" carried the ownership argument by itself; "Freeheld" does not. **The tagline does that work now, so "Own the book." goes everywhere the name goes.**
 
 The name lives in one environment variable (`BRAND_NAME`). Changing it changes every page, email and message.
 
@@ -18,27 +14,32 @@ The name lives in one environment variable (`BRAND_NAME`). Changing it changes e
 
 | Risk | Detail | Mitigation |
 |---|---|---|
-| Search noise | Freehold, New Jersey (two towns) floods results | Always pair it in search and ads: "Freehold Reservations," "Freehold for restaurants" |
-| Same-name venue | Freehold Brooklyn, a bar and event space since 2015 | Different class (restaurant services vs software); still run a USPTO search |
-| Existing mark | FREEHOLD (apparel) | Different class |
-| Domains | freehold.com/.org/.app registered (parked); get-/use-/join-freehold.com registered | See the domain plan below |
-
-Domain status came from DNS lookups, not registrar checks (RDAP was blocked). Confirm at a registrar before relying on it.
+| Search noise | *Freeheld* (2015 film, Julianne Moore) and the 2007 Oscar-winning documentary short | Pair the name in search, ads and page titles: "Freeheld reservations," "Freeheld for restaurants." Restaurant pages rank on the restaurant's name, not ours |
+| Trademark | A film title sits in a different class (entertainment) from restaurant software | USPTO search in Classes 9, 35, 42 and 43 before launch |
+| .com | freeheld.com is not available | Discovery is search and backlinks, not typing. Do not buy it at a premium |
+| Mishearing | Some will hear "freehold" | Spell it on the phone once: "free-HELD." Never mix the two names in materials |
 
 ## Domain plan
 
-freehold.com is taken and parked. Do not chase it: buying a parked premium name costs real money and buys nothing a diner will notice, because diners reach restaurants through the restaurant's own page and Google, not by typing our domain.
+1. **freeheld.io** is the home: brand site, restaurant booking pages, and the domain that sends email and texts. Google treats .io like any generic domain for ranking, and mail from .io delivers normally.
+2. **freeheld.coop** once the cooperative is formed (the registry only allows real co-ops), redirecting to freeheld.io. A trust mark more than an address.
+3. Optional: a short diner-link domain later (for example yourtable.is) if text-message length starts to cost real money.
 
-1. **freehold.coop as the home.** .coop is open only to real cooperatives (the registry verifies), so the domain itself says "owned by its members." It is the brand and the structure in one address. Register it as soon as the cooperative exists; check with the registry whether a co-op in formation qualifies earlier.
-2. **freeholdtables.com now, as a holding .com.** Buy it today, use it until .coop is live, then redirect it there forever. People who guess ".com" still land somewhere.
-3. **Optional defensive names:** freehold.restaurant, freeholdreservations.com.
+## How search and links do the work
 
-All of these had no DNS records on October 4, 2026. No DNS usually means unregistered but not always; confirm at a registrar before relying on it.
+The growth engine is every member restaurant's booking page on freeheld.io, plus the restaurants linking to it. What the product does for that:
 
-## Alternatives, ranked
+- **Each booking page is a real, indexable page**: the restaurant's name, address and phone are in the HTML itself, with schema.org `Restaurant` and `ReserveAction` data, a canonical URL, and a title like "Book a table at Juniper & Rye." These rank for "[restaurant] reservations."
+- **A sitemap** (`/sitemap.xml`, announced in `robots.txt`) lists every restaurant currently taking online bookings.
+- **The website snippet is a real link.** It is `<a href=".../r/slug">Reserve a table at Juniper & Rye</a>` plus a script that turns it into a pop-up button. Search engines follow the link (an iframe or a script-only button would give nothing), and the link still works if scripts are blocked. It points to the restaurant's own booking page with the restaurant's name as the text: a link the restaurant chose to place, which is what search engines reward. **Never add hidden or keyword-stuffed credit links to the widget**: Google treats widget link schemes as spam, and it would hurt every member.
+- **Ask every restaurant for three links at onboarding:** the website button, the Google Business Profile reservation link, and the Instagram bio link (OPERATIONS.md, onboarding checklist).
+
+## Alternatives considered
+
+**Freehold** was the original pick: the strongest meaning (property you own outright), but freehold.com and the other good domains are taken, and Freehold, NJ floods search. The others, ranked:
 
 1. **Own the Book.** The plainest statement of what we are. A verb-phrase nonprofit brand has strong precedent: Let's Encrypt broke a paid-certificate toll the same way. .org/.app/.co appear open. Not yet conflict-searched.
-2. **Bookhold.** Coined from two restaurant words, echoes "freehold" without the New Jersey noise. .org/.co appear open.
+2. **Bookhold.** Coined from two restaurant words, echoes "freehold" without its New Jersey noise. .org/.co appear open.
 3. **Covers Co-op.** Strong and honest, but only usable if the entity is legally a cooperative (many states restrict "co-op" in names).
 
 ## Names to avoid
@@ -49,7 +50,7 @@ All of these had no DNS records on October 4, 2026. No DNS usually means unregis
 
 ## Positioning statement
 
-For independent restaurant owners tired of renting their own regulars back, Freehold is the reservation book you own outright. Pay once, no cover fees, and your guests and data stay yours. OpenTable, Resy and SevenRooms belong to companies that make money from your diners (Booking Holdings, American Express, DoorDash). Freehold is run for, and ideally owned by, the restaurants that use it.
+For independent restaurant owners tired of renting their own regulars back, Freeheld is the reservation book you own outright. Pay once, no cover fees, and your guests and data stay yours. OpenTable, Resy and SevenRooms belong to companies that make money from your diners (Booking Holdings, American Express, DoorDash). Freeheld is run for, and ideally owned by, the restaurants that use it.
 
 ## Message hierarchy
 
@@ -77,12 +78,12 @@ Proof points, in the product: the payback calculator on the landing page, and th
 
 ## Growth loop
 
-Every confirmation email and booking page ends with "Booked with Freehold, reservations restaurants own." Diners include restaurant owners, and this footer is the cheapest channel we will ever have. Keep it one line and never louder.
+Every confirmation email and booking page ends with "Booked with Freeheld, reservations restaurants own." Diners include restaurant owners, and this footer is the cheapest channel we will ever have. Keep it one line and never louder.
 
 ## Before launch (checklist)
 
-- [ ] USPTO search for Freehold, Own the Book and Bookhold in Classes 9, 35, 42 and 43 (attorney review recommended)
-- [ ] Buy freeholdtables.com now; register freehold.coop when the cooperative is formed
+- [ ] USPTO search for Freeheld and Own the Book in Classes 9, 35, 42 and 43 (attorney review recommended)
+- [ ] Buy freeheld.io; register freeheld.coop when the cooperative is formed
 - [x] License decided: AGPL-3.0 (LICENSE file, source link on every page)
 - [ ] Make the repository public (or a public mirror) before launch, so the AGPL source link works
 - [ ] Re-verify every competitor price on the landing page against vendor pages, with the date

@@ -7,7 +7,7 @@ COPY public ./public
 COPY scripts ./scripts
 RUN mkdir -p /data && chown node:node /data
 ENV NODE_ENV=production \
-    DATABASE_PATH=/data/freehold.db \
+    DATABASE_PATH=/data/freeheld.db \
     PORT=3000
 VOLUME /data
 EXPOSE 3000

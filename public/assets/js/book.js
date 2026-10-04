@@ -10,7 +10,7 @@ if (embed) {
   // Key presses inside the frame never reach the host page, so tell the
   // widget to close on Escape. The message carries no data.
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && !document.querySelector('.backdrop')) window.parent.postMessage({ type: 'freehold:close' }, '*');
+    if (e.key === 'Escape' && !document.querySelector('.backdrop')) window.parent.postMessage({ type: 'freeheld:close' }, '*');
   });
 }
 const slug = document.body.dataset.slug;

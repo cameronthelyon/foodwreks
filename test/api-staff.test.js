@@ -271,7 +271,7 @@ test('import guests and reservations from another system, then export', async ()
   assert.match(csv, /Katherine,Johnson,\+14155551001,kj@example.com,VIP; Regular/);
   assert.match(csv, /"Allergic to ""shellfish"""/);
   const all = await (await fetch(`${t.base}/api/r/${rid}/export/all.json`, { headers: { cookie } })).json();
-  assert.equal(all.format, 'freehold-export-v1');
+  assert.equal(all.format, 'freeheld-export-v1');
   assert.equal(all.guests.length, 4);
   assert.ok(all.reservations.every((r) => !('manage_salt' in r)));
 });

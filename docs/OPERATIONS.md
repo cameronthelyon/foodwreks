@@ -8,34 +8,34 @@ The franchise prototype: every recurring job written down so that someone other 
 
 **Target:** one small Linux VM (2 vCPU, 2-4 GB RAM, SSD), Node.js 22.13+ (current LTS preferred), and a reverse proxy for TLS. Docker also works (see `Dockerfile`).
 
-- [ ] Create a non-root user `freehold`; clone the repository to `/opt/freehold`
-- [ ] Create `/opt/freehold/.env` from `.env.example`. Set at minimum: `NODE_ENV=production`, `BASE_URL=https://your-domain`, `APP_SECRET` (`openssl rand -base64 48`), `DATABASE_PATH=/var/lib/freehold/freehold.db`, `TRUST_PROXY=1`, `BRAND_NAME`, `SUPPORT_EMAIL`, `SOURCE_URL` (public repository of the exact code deployed; the AGPL requires it)
+- [ ] Create a non-root user `freeheld`; clone the repository to `/opt/freeheld`
+- [ ] Create `/opt/freeheld/.env` from `.env.example`. Set at minimum: `NODE_ENV=production`, `BASE_URL=https://your-domain`, `APP_SECRET` (`openssl rand -base64 48`), `DATABASE_PATH=/var/lib/freeheld/freeheld.db`, `TRUST_PROXY=1`, `BRAND_NAME`, `SUPPORT_EMAIL`, `SOURCE_URL` (public repository of the exact code deployed; the AGPL requires it)
 - [ ] **Store `APP_SECRET` in your password manager.** Losing it makes integration credentials unreadable and invalidates every manage link and session
 - [ ] Set email: `EMAIL_PROVIDER`, its key, and an `EMAIL_FROM` on a domain with SPF, DKIM and DMARC records
-- [ ] `mkdir -p /var/lib/freehold && chown freehold /var/lib/freehold`
-- [ ] Install the systemd unit below; `systemctl enable --now freehold`
+- [ ] `mkdir -p /var/lib/freeheld && chown freeheld /var/lib/freeheld`
+- [ ] Install the systemd unit below; `systemctl enable --now freeheld`
 - [ ] Put Caddy (or nginx) in front for TLS (Caddyfile below)
 - [ ] Check `https://your-domain/healthz` returns `{"ok":true}`
-- [ ] Sign up the first account, then make it a platform admin: `sqlite3 /var/lib/freehold/freehold.db "UPDATE users SET is_platform_admin = 1 WHERE email = 'you@example.org'"`
+- [ ] Sign up the first account, then make it a platform admin: `sqlite3 /var/lib/freeheld/freeheld.db "UPDATE users SET is_platform_admin = 1 WHERE email = 'you@example.org'"`
 - [ ] Set up off-box backups (section 4) and **run a restore drill (section 5) before the first restaurant goes live**
 - [ ] Optional: `SIGNUPS_OPEN=0` during pilots, creating accounts by invitation
 
 ```ini
-# /etc/systemd/system/freehold.service
+# /etc/systemd/system/freeheld.service
 [Unit]
-Description=Freehold reservations
+Description=Freeheld reservations
 After=network.target
 
 [Service]
-User=freehold
-WorkingDirectory=/opt/freehold
-EnvironmentFile=/opt/freehold/.env
+User=freeheld
+WorkingDirectory=/opt/freeheld
+EnvironmentFile=/opt/freeheld/.env
 ExecStart=/usr/bin/node --disable-warning=ExperimentalWarning server.js
 Restart=always
 RestartSec=3
 NoNewPrivileges=true
 ProtectSystem=full
-ReadWritePaths=/var/lib/freehold
+ReadWritePaths=/var/lib/freeheld
 
 [Install]
 WantedBy=multi-user.target
@@ -56,11 +56,11 @@ Server-sent events need proxy buffering off. Caddy streams by default; for nginx
 
 - [ ] `npm test` passes locally (all green, no skips)
 - [ ] Read the diff for migrations (`lib/db.js` MIGRATIONS). New migrations only append; never edit a shipped one
-- [ ] Take a manual backup first: `sqlite3 /var/lib/freehold/freehold.db ".backup /var/lib/freehold/pre-release.db"`
+- [ ] Take a manual backup first: `sqlite3 /var/lib/freeheld/freeheld.db ".backup /var/lib/freeheld/pre-release.db"`
 - [ ] Deploy outside service hours (mid-afternoon, never 5 to 9 PM local)
-- [ ] `git pull && systemctl restart freehold`
+- [ ] `git pull && systemctl restart freeheld`
 - [ ] `/healthz` is OK; log in; open one restaurant's Book and Floor views; load one booking page
-- [ ] Watch logs for 10 minutes: `journalctl -u freehold -f`
+- [ ] Watch logs for 10 minutes: `journalctl -u freeheld -f`
 - [ ] If anything is wrong: `git checkout <previous tag>`, restore `pre-release.db` if a migration ran, restart
 
 ---
@@ -69,7 +69,7 @@ Server-sent events need proxy buffering off. Caddy streams by default; for nginx
 
 - [ ] `/admin`: messages sent vs failed. Investigate any failure pattern (wrong domain records, an invalid number repeated)
 - [ ] `/admin`: integration errors. Re-auth or contact the restaurant
-- [ ] Disk: `df -h /var/lib/freehold` under 70%
+- [ ] Disk: `df -h /var/lib/freeheld` under 70%
 - [ ] Newest backup is from the last 24 hours, and an off-box copy exists
 - [ ] Trials ending in the next 7 days: personal note to each owner
 - [ ] Update the scorecard (STRATEGY.md): restaurants live, covers, channel mix, no-show rate, support minutes per restaurant, texting cost, failed messages, uptime
@@ -80,8 +80,8 @@ Server-sent events need proxy buffering off. Caddy streams by default; for nginx
 
 The server writes a consistent snapshot every `BACKUP_INTERVAL_HOURS` (default 24) to `BACKUP_DIR` and keeps `BACKUP_KEEP` (default 14). **Snapshots on the same disk are not backups.**
 
-- [ ] Copy snapshots off the box nightly, for example `rclone copy /var/lib/freehold/backups remote:freehold-backups` on a cron at 4 AM
-- [ ] Better: run Litestream for continuous replication of `freehold.db` to object storage
+- [ ] Copy snapshots off the box nightly, for example `rclone copy /var/lib/freeheld/backups remote:freeheld-backups` on a cron at 4 AM
+- [ ] Better: run Litestream for continuous replication of `freeheld.db` to object storage
 - [ ] Keep at least one monthly copy for a year
 
 ---
@@ -165,9 +165,9 @@ Run both systems for one service, then switch. Never switch on a Friday.
 
 ## 10. Incident: site down
 
-- [ ] `systemctl status freehold`; `journalctl -u freehold -n 200`
+- [ ] `systemctl status freeheld`; `journalctl -u freeheld -n 200`
 - [ ] Disk full? Free space (old backups, logs). Writes fail while deletes still succeed
-- [ ] Restart: `systemctl restart freehold`; check `/healthz`
+- [ ] Restart: `systemctl restart freeheld`; check `/healthz`
 - [ ] Still down: restore to a new machine (section 5) and point DNS at it
 - [ ] Afterwards: a short note to affected owners with what happened, what was lost (usually nothing: bookings are in the database, messages retry), and the fix
 

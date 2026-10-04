@@ -47,7 +47,7 @@ test('postmark, resend and twilio payloads', async () => {
 test('templates escape restaurant and guest input', () => {
   const restaurant = { name: 'Bob <script>', address: '1 A St', phone: '555' };
   const row = { guest_name: 'Eve "x"', party_size: 2, date: '2026-10-12', start_min: 1140, occasion: '<b>', guest_notes: '', code: 'ABC' };
-  const msg = reservationTemplate('confirmation', { restaurant, row, settings: sanitizeSettings({}), links: { manage: 'https://h/m/ABC?t=1' }, brand: 'Freehold' });
+  const msg = reservationTemplate('confirmation', { restaurant, row, settings: sanitizeSettings({}), links: { manage: 'https://h/m/ABC?t=1' }, brand: 'Freeheld' });
   assert.ok(!msg.html.includes('<script>'));
   assert.ok(msg.html.includes('Bob &lt;script&gt;'));
   assert.ok(msg.sms.includes('Reply STOP'));
