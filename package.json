@@ -4,7 +4,7 @@
   "description": "Pay-once reservation system for independent restaurants. No cover fees, no monthly rent, your guests stay yours.",
   "type": "module",
   "private": true,
-  "license": "UNLICENSED",
+  "license": "AGPL-3.0-only",
   "engines": {
     "node": ">=22.13"
   },

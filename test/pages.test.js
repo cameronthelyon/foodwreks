@@ -58,3 +58,11 @@ test('static assets are served safely', async () => {
   assert.equal((await get('/api/nope')).headers.get('content-type'), 'application/json; charset=utf-8');
   assert.match(await (await get('/robots.txt')).text(), /Disallow: \/app/);
 });
+
+test('every user-facing page links to the source, as the AGPL requires', async () => {
+  const { slug } = await signup(t);
+  const source = 'https://github.com/cameronthelyon/foodwreks';
+  for (const path of ['/', `/r/${slug}`, '/app']) {
+    assert.ok((await (await get(path)).text()).includes(source), path);
+  }
+});

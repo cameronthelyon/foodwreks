@@ -68,11 +68,11 @@ The reservation book is infrastructure the restaurant owns, like its lease and i
 
 Methods are flexible. The identity is not.
 
-- **Open source (AGPL-3.0 recommended) plus one-click export.** This is what makes "lifetime" believable: even if the organization fails, the book keeps working. AGPL specifically stops a funded company from forking the code into a closed competitor. *Decision for you and counsel; the landing page copy assumes it.*
+- **Open source (AGPL-3.0, decided) plus one-click export.** This is what makes "lifetime" believable: even if the organization fails, the book keeps working. AGPL specifically stops a funded company from forking the code into a closed competitor: anyone who runs a modified copy as a service must publish their changes.
 - **Google first.** Day one: every restaurant puts its booking link (tagged `?ref=google`) on its Google Business Profile. No partnership needed. Next: Google Actions Center "Reservations Redirect" or "Business Link" (feeds only). Then "Reservations end-to-end" (booking inside Google). Google lists no minimum merchant count in the docs; it requires a contract with every merchant, real-time availability, and 30+ days of inventory. The booking server and feeds are already built (`lib/google.js`) and need partner approval plus sandbox review.
 - **Agent-ready.** Booking pages carry schema.org `ReserveAction` data, and the public availability and booking API is plain JSON, documented in [API.md](API.md) so any AI agent can book any member restaurant without a toll. Next step: an MCP server wrapping the same calls.
 - **Three POS integrations, read-only, then stop.** Toast, Square, Clover. A fourth only when paying members ask for it.
-- **Distribution through institutions that already serve small business.** California's Small Business Development Centers (many hosted by community colleges), restaurant associations, POS resellers, culinary programs. If this connects to your work at the Foundation for California Community Colleges, structure it as a mission program and check conflict-of-interest rules before using that network.
+- **Distribution through institutions that already serve small business.** Restaurant associations, POS resellers, Small Business Development Centers, culinary programs, and restaurant-owner peer groups. Each member restaurant is also a recruiter: owners trust owners.
 
 ---
 
@@ -94,7 +94,7 @@ Methods are flexible. The identity is not.
 | Fear of losing marketplace diners | Google link day one; per-channel reporting; parallel-run cutover checklist | Built |
 | Migration pain (guests, future bookings) | CSV import with auto-mapping, duplicate detection, no guest messages | Built |
 | Host stand retraining | List, timeline and waitlist with one-tap actions; 15-minute training | Built |
-| Trust: "will you exist in ten years?" | Open source, full export, cooperative structure | Decision pending |
+| Trust: "will you exist in ten years?" | Open source (AGPL), full export, cooperative structure | Decided; co-op not yet formed |
 | Card holds and no-show protection | Restaurant's own Stripe account; we never touch the money | Built |
 
 **For the venture, the bottleneck is distribution and support, not software.** The software exists. The constraint is getting the first 25 restaurants to cut over and keeping support load low enough that the endowment survives. Fix that constraint before adding any feature.
@@ -136,15 +136,15 @@ Methods are flexible. The identity is not.
 
 ---
 
-## Structure: a cooperative beats a 501(c)(3) for this
+## Structure: a cooperative (decided)
 
 *Not legal advice. Exempt-organization counsel needed before anything is signed.*
 
 - **501(c)(3).** Selling licenses to for-profit restaurants at market rate is likely unrelated business income: 21% tax on net, plus the bigger risk that sales become the primary activity and threaten the exemption itself (commerciality, private benefit). It can be related if it serves a charitable class: Rev. Rul. 74-587 covers assistance to businesses in economically depressed areas. In practice that means a c3 serving defined low-income communities, with a taxable subsidiary selling to everyone else.
 - **501(c)(6).** Does not fix it. Particular services sold to members are unrelated business income.
-- **Cooperative (recommended).** Under California's Consumer Cooperative Corporation Law, restaurants buy a **$1,000 member share**: lifetime access, one vote, and patronage dividends if there is surplus. That is the hedgehog made legal: restaurants literally own the book. Precedents: Ace Hardware (retailer-owned since 1976), franchisee purchasing co-ops (Yum!'s UFPC, Subway's IPC), platform co-ops (Stocksy, The Drivers Cooperative). Watch: a member share can raise securities questions.
+- **Cooperative (chosen).** Under California's Consumer Cooperative Corporation Law, restaurants buy a **$1,000 member share**: lifetime access, one vote, and patronage dividends if there is surplus. That is the hedgehog made legal: restaurants literally own the book. Precedents: Ace Hardware (retailer-owned since 1976), franchisee purchasing co-ops (Yum!'s UFPC, Subway's IPC), platform co-ops (Stocksy, The Drivers Cooperative). Watch: a member share can raise securities questions.
 - **The warning:** True Value. A co-op that sold control to private equity (2018), lost its co-op character, and went bankrupt (2024). Put an asset lock in the bylaws: the software and member data cannot be sold out from under members.
-- **Recommended shape:** a cooperative owned by member restaurants, plus a 501(c)(3) partner or fiscal sponsor that funds onboarding for restaurants in low-income communities through grants.
+- **Shape:** a cooperative owned by member restaurants, plus a 501(c)(3) partner or fiscal sponsor that funds onboarding for restaurants in low-income communities through grants.
 
 ---
 
@@ -164,7 +164,7 @@ Methods are flexible. The identity is not.
 | # | Rock | Done means |
 |---|---|---|
 | 1 | Five pilot restaurants live | Cut over from OpenTable or Resy using the checklist; two full services each without the old system |
-| 2 | Structure and license decided | Counsel engaged; co-op vs c3 + subsidiary decided; AGPL decision; trademark search on the name |
+| 2 | Cooperative formed | Counsel engaged; articles and bylaws filed with the asset lock; member share terms reviewed for securities questions; trademark search on Freehold; freehold.coop registered |
 | 3 | Production ready | Deployed with backups and a tested restore; Postmark live; toll-free texting verified for pilots |
 | 4 | Google channel live | Every pilot has the GBP reservation link; Actions Center interest form submitted |
 | 5 | One POS validated | Toast Standard API access tested against a pilot's real data |

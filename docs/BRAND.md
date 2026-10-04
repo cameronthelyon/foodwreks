@@ -21,9 +21,19 @@ The name lives in one environment variable (`BRAND_NAME`). Changing it changes e
 | Search noise | Freehold, New Jersey (two towns) floods results | Always pair it in search and ads: "Freehold Reservations," "Freehold for restaurants" |
 | Same-name venue | Freehold Brooklyn, a bar and event space since 2015 | Different class (restaurant services vs software); still run a USPTO search |
 | Existing mark | FREEHOLD (apparel) | Different class |
-| Domains | freehold.com/.org/.app registered (parked); get-/use-/join-freehold.com registered | **freehold.coop is open** (restricted to real cooperatives, so it doubles as a trust mark if you go co-op); **freeholdtables.com is open** |
+| Domains | freehold.com/.org/.app registered (parked); get-/use-/join-freehold.com registered | See the domain plan below |
 
 Domain status came from DNS lookups, not registrar checks (RDAP was blocked). Confirm at a registrar before relying on it.
+
+## Domain plan
+
+freehold.com is taken and parked. Do not chase it: buying a parked premium name costs real money and buys nothing a diner will notice, because diners reach restaurants through the restaurant's own page and Google, not by typing our domain.
+
+1. **freehold.coop as the home.** .coop is open only to real cooperatives (the registry verifies), so the domain itself says "owned by its members." It is the brand and the structure in one address. Register it as soon as the cooperative exists; check with the registry whether a co-op in formation qualifies earlier.
+2. **freeholdtables.com now, as a holding .com.** Buy it today, use it until .coop is live, then redirect it there forever. People who guess ".com" still land somewhere.
+3. **Optional defensive names:** freehold.restaurant, freeholdreservations.com.
+
+All of these had no DNS records on October 4, 2026. No DNS usually means unregistered but not always; confirm at a registrar before relying on it.
 
 ## Alternatives, ranked
 
@@ -72,7 +82,8 @@ Every confirmation email and booking page ends with "Booked with Freehold, reser
 ## Before launch (checklist)
 
 - [ ] USPTO search for Freehold, Own the Book and Bookhold in Classes 9, 35, 42 and 43 (attorney review recommended)
-- [ ] Buy domains (freehold.coop requires co-op status; freeholdtables.com as fallback)
-- [ ] Decide the license. The landing page promises open source; make it true (AGPL-3.0 recommended) or change the copy
+- [ ] Buy freeholdtables.com now; register freehold.coop when the cooperative is formed
+- [x] License decided: AGPL-3.0 (LICENSE file, source link on every page)
+- [ ] Make the repository public (or a public mirror) before launch, so the AGPL source link works
 - [ ] Re-verify every competitor price on the landing page against vendor pages, with the date
 - [ ] Set `BRAND_NAME` and `SUPPORT_EMAIL` in production

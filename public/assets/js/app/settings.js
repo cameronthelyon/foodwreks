@@ -1064,7 +1064,7 @@ function license(el, route, attempt = 0) {
         h('li', {}, 'Every feature, every update, for as long as you run this location.'),
         h('li', {}, 'No per-cover fees and no monthly fee. Ever.'),
         h('li', {}, 'Transfers with the restaurant if you sell it.'),
-        h('li', {}, 'Your data exports any time; the software is open source, so it outlives any one company.'),
+        h('li', {}, 'Your data exports any time, and the software is open source (AGPL-3.0), so it outlives any one company.'),
         h('li', {}, 'Text messages are billed separately at carrier cost (about 1.3¢ each), because carriers charge per message.'),
       ),
       ['lifetime', 'comped'].includes(l.kind)

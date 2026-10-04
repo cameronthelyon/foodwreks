@@ -9,7 +9,7 @@ The franchise prototype: every recurring job written down so that someone other 
 **Target:** one small Linux VM (2 vCPU, 2-4 GB RAM, SSD), Node.js 22.13+ (current LTS preferred), and a reverse proxy for TLS. Docker also works (see `Dockerfile`).
 
 - [ ] Create a non-root user `freehold`; clone the repository to `/opt/freehold`
-- [ ] Create `/opt/freehold/.env` from `.env.example`. Set at minimum: `NODE_ENV=production`, `BASE_URL=https://your-domain`, `APP_SECRET` (`openssl rand -base64 48`), `DATABASE_PATH=/var/lib/freehold/freehold.db`, `TRUST_PROXY=1`, `BRAND_NAME`, `SUPPORT_EMAIL`
+- [ ] Create `/opt/freehold/.env` from `.env.example`. Set at minimum: `NODE_ENV=production`, `BASE_URL=https://your-domain`, `APP_SECRET` (`openssl rand -base64 48`), `DATABASE_PATH=/var/lib/freehold/freehold.db`, `TRUST_PROXY=1`, `BRAND_NAME`, `SUPPORT_EMAIL`, `SOURCE_URL` (public repository of the exact code deployed; the AGPL requires it)
 - [ ] **Store `APP_SECRET` in your password manager.** Losing it makes integration credentials unreadable and invalidates every manage link and session
 - [ ] Set email: `EMAIL_PROVIDER`, its key, and an `EMAIL_FROM` on a domain with SPF, DKIM and DMARC records
 - [ ] `mkdir -p /var/lib/freehold && chown freehold /var/lib/freehold`

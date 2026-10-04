@@ -58,10 +58,10 @@ Production deployment, backups, restore drills, onboarding and cutover checklist
 
 ## Status: what is and is not proven
 
-- **Proven by tests:** the availability engine, every booking and host-stand flow, roles and tenant isolation, imports and exports, reports, notifications, and the integration request shapes. `npm test` runs 87 tests in under 4 seconds.
+- **Proven by tests:** the availability engine, every booking and host-stand flow, roles and tenant isolation, imports and exports, reports, notifications, and the integration request shapes. `npm test` runs 88 tests in under 4 seconds.
 - **Driven in a real browser:** booking, manage, host stand, floor drag-and-drop, waitlist, guests, settings, import.
 - **Not yet proven:** no integration has run against a live sandbox (Toast, Square, Clover, Stripe, Google, Postmark, Twilio). Budget a day each before a pilot depends on one. Google booking-inside-Google needs Google's partner approval.
-- **Decisions that are yours:** the license (the landing page promises open source; AGPL-3.0 is recommended), the operating entity (cooperative recommended; see STRATEGY.md), and the name (see BRAND.md).
+- **Decided:** AGPL-3.0 license; operated as a cooperative owned by member restaurants (see STRATEGY.md). **Still open:** trademark search and domains (see BRAND.md).
 
 ## Develop
 
@@ -72,3 +72,9 @@ npm run seed      # load the demo restaurant into the configured database
 ```
 
 Code layout and conventions: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+
+## License
+
+Copyright 2026 the Freehold authors (to be assigned to the cooperative when it is formed).
+
+Freehold is free software under the [GNU Affero General Public License v3.0](LICENSE) (`AGPL-3.0-only`). If you run a modified version as a service, you must offer your users its source. Every page links to the source at `SOURCE_URL`; point it at a public repository of the exact code you run.

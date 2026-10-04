@@ -131,6 +131,7 @@ function renderShell() {
       { class: 'foot' },
       h('div', { style: { padding: '0 10px 6px' } }, state.me.user.name || state.me.user.email, h('br'), h('span', { class: 'small' }, `${state.restaurant.role}`)),
       h('button', { class: 'btn ghost small', onclick: cycleTheme }, icon('moon'), 'Theme'),
+      h('a', { class: 'small muted', href: document.body.dataset.source, rel: 'noopener', target: '_blank', style: { padding: '4px 10px' } }, 'Source code (AGPL)'),
       state.me.user.isPlatformAdmin ? h('a', { class: 'btn ghost small', href: '/admin', style: { justifyContent: 'flex-start', width: '100%' } }, icon('shield'), 'Admin') : null,
       h(
         'button',
@@ -217,6 +218,7 @@ function accountMenu() {
         : h('p', { class: 'muted small', style: { margin: 0 } }, state.restaurant.name),
       h('button', { class: 'btn block', onclick: () => (cycleTheme(), m.close()) }, 'Switch theme'),
       state.me.user.isPlatformAdmin ? h('a', { class: 'btn block', href: '/admin' }, 'Admin') : null,
+      h('a', { class: 'btn block', href: document.body.dataset.source, rel: 'noopener', target: '_blank' }, 'Source code (AGPL)'),
       h(
         'button',
         {
