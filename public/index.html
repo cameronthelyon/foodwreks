@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{BRAND}}: reservations restaurants own</title>
+  <meta name="description" content="Reservation software for independent restaurants. Pay $1,000 once. No cover fees, no monthly rent. Your guests and your data stay yours.">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/assets/css/base.css">
+  <link rel="stylesheet" href="/assets/css/site.css">
+  <script type="module" src="/assets/js/site.js"></script>
+</head>
+<body>
+  <header class="site-nav">
+    <a class="logo" href="/"><svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#1F4D3F"/><path d="M10 6h12v20l-6-4.6L10 26z" fill="#F6F2EA"/></svg>{{BRAND}}</a>
+    <nav>
+      <a href="#how">How it works</a>
+      <a href="#cost">Cost</a>
+      <a href="#faq">Questions</a>
+      <a href="/login">Log in</a>
+      <a class="btn primary small" href="/signup">Start free trial</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">Reservations for independent restaurants</p>
+        <h1>Own the book.</h1>
+        <p class="lede">Pay <strong>$1,000 once</strong>. No cover fees. No monthly rent. Your guests, your data, your booking page, for as long as you run the restaurant.</p>
+        <div class="row">
+          <a class="btn primary" href="/signup">Start a free 30-day trial</a>
+          <a class="btn" href="#cost">Do the math</a>
+        </div>
+        <p class="small muted">No card to start. Bring your guest list from OpenTable, Resy or a spreadsheet.</p>
+      </div>
+      <div class="hero-art" aria-hidden="true">
+        <div class="mock">
+          <div class="mock-head"><span>Tonight</span><span class="muted">Fri · 64 covers</span></div>
+          <div class="mock-row"><b>6:00</b><span>Okafor · 4</span><span class="chip ok">Seated</span></div>
+          <div class="mock-row"><b>6:15</b><span>Patel · 2 <em>VIP</em></span><span class="chip info">Arrived</span></div>
+          <div class="mock-row"><b>6:30</b><span>Ramirez · 6</span><span class="chip">Booked</span></div>
+          <div class="mock-row"><b>6:30</b><span>Kim · 2</span><span class="chip">Booked</span></div>
+          <div class="mock-row"><b>7:00</b><span>Haddad · 3 <em>Birthday</em></span><span class="chip">Booked</span></div>
+          <div class="mock-foot"><span>Cover fees tonight</span><b>$0.00</b></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="band" id="why">
+      <div class="wrap three">
+        <div><h3>No toll on your own regulars</h3><p>Per-cover platforms charge you when your own guests book you through them, including bookings that started on Google. Here, a cover costs nothing.</p></div>
+        <div><h3>Your guests stay yours</h3><p>Every name, note, allergy and visit lives in your book. Export all of it any day, in one click. No network sells your diners to the place down the street.</p></div>
+        <div><h3>Built to last, not to flip</h3><p>Open source and run as community infrastructure. If we ever stopped, your data and the software would still be yours to keep running.</p></div>
+      </div>
+    </section>
+
+    <section class="wrap" id="how">
+      <h2>How it works</h2>
+      <ol class="steps">
+        <li><b>Set up in an afternoon.</b> Tables, hours, turn times and pacing. Import your guest list and upcoming bookings from a CSV export.</li>
+        <li><b>Put your link where diners already look.</b> One line of code on your website, your Google Business Profile reservation link, your Instagram bio.</li>
+        <li><b>Run service from any tablet.</b> A live book and floor timeline on every device, a texting waitlist, reminders, and no-show protection on your own Stripe account.</li>
+      </ol>
+      <div class="features">
+        <div><h4>Booking page and widget</h4><p>Fast, mobile first, embeddable, with deep links for Google and Instagram.</p></div>
+        <div><h4>Smart seating</h4><p>Best-fit table assignment, combinations, pacing per slot, and automatic re-seating to fit one more party.</p></div>
+        <div><h4>Host stand</h4><p>List and timeline views, drag to re-seat, live sync across devices, walk-ins in two taps.</p></div>
+        <div><h4>Waitlist</h4><p>Quotes from your live floor, "table ready" texts, and a page where guests see their place in line.</p></div>
+        <div><h4>Guest book</h4><p>Profiles, tags, allergies, visit and no-show history, spend from your POS.</p></div>
+        <div><h4>POS connections</h4><p>Toast, Square and Clover, read-only: spend per guest, and tables free up when checks close.</p></div>
+        <div><h4>Fewer no-shows</h4><p>Reminders, self-service changes, and optional card holds. Fees go straight to you.</p></div>
+        <div><h4>Reports</h4><p>Covers, no-show rate, channels, returning guests. Plain numbers, no guessing.</p></div>
+      </div>
+    </section>
+
+    <section class="band" id="cost">
+      <div class="wrap">
+        <h2>What it costs you today</h2>
+        <p class="muted">Published plan prices, October 2026. Check each vendor for current pricing.</p>
+        <div class="table-wrap">
+          <table class="data compare">
+            <thead><tr><th>Platform</th><th>Monthly</th><th>Per cover</th><th>Year one*</th></tr></thead>
+            <tbody>
+              <tr><td>OpenTable Core</td><td>$299</td><td>$1.00 on network covers, which include Google bookings</td><td>$8,388</td></tr>
+              <tr><td>OpenTable Basic</td><td>$149</td><td>$1.50 network, plus $0.25 per website cover</td><td>$8,988 + website covers</td></tr>
+              <tr><td>Resy Platform</td><td>$289</td><td>None</td><td>$3,468</td></tr>
+              <tr><td>Yelp Guest Manager Basic</td><td>$159 (500-cover cap)</td><td>None</td><td>$1,908</td></tr>
+              <tr class="us"><td><b>{{BRAND}}</b></td><td><b>$0</b></td><td><b>None</b></td><td><b>$1,000 once</b></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="small muted">*Assumes 400 network-rate covers a month where per-cover fees apply. Texting is the one variable cost: carriers charge per message, so texts are passed through at cost, about 1.3¢ each today.</p>
+
+        <div class="calc card flat" id="calc">
+          <h3>Your payback</h3>
+          <div class="grid-3">
+            <label class="field"><span>Monthly subscription now</span><input type="number" id="c-fee" min="0" value="299"></label>
+            <label class="field"><span>Covers billed per month</span><input type="number" id="c-covers" min="0" value="400"></label>
+            <label class="field"><span>Fee per billed cover ($)</span><input type="number" id="c-rate" min="0" step="0.05" value="1.00"></label>
+          </div>
+          <div class="calc-out" aria-live="polite">
+            <div><span class="muted">You pay now, per year</span><b id="c-year">$8,388</b></div>
+            <div><span class="muted">{{BRAND}} pays for itself in</span><b id="c-payback">44 days</b></div>
+            <div><span class="muted">Kept over five years</span><b id="c-five">$40,940</b></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="wrap" id="faq">
+      <h2>The honest answers</h2>
+      <details open><summary>Will I lose diners who find me on OpenTable or Resy?</summary><p>Some, possibly. Here is the plain version: most diners find a restaurant on Google Maps, Instagram or its own website, and OpenTable bills Google-sourced bookings at its network rate. {{BRAND}} puts your Reserve button on all three at no per-cover cost. If a large share of your covers truly come from people browsing a marketplace app, compare the bills before you leave, or run both for a month.</p></details>
+      <details><summary>How can one payment cover "lifetime"?</summary><p>Because the software is built to be cheap to run: one modest server handles thousands of restaurants, there is no sales team, and nobody is waiting for a toll on every cover. Each license works like a small endowment for your share of hosting and upkeep. Texting is the exception, because carriers charge per message, so it is passed through at cost.</p></details>
+      <details><summary>What exactly does "lifetime" mean?</summary><p>One license per location, for as long as you operate it. It transfers if you sell the restaurant. Your data is exportable at any time, and the code is open source, so your book keeps working even in the worst case.</p></details>
+      <details><summary>Do you take a cut of deposits or no-show fees?</summary><p>No. Card holds run on your own Stripe account and the money goes straight to you. We never touch it.</p></details>
+      <details><summary>Does it work with my POS?</summary><p>Toast, Square and Clover connect read-only. We read closed checks to show spend per guest and to free tables when a check closes. We never write to your POS. Without a POS connection everything else works the same.</p></details>
+      <details><summary>Can I bring my history?</summary><p>Yes. Export guests and future reservations from your current system as CSV and import them. We map the columns automatically and never message your guests during an import.</p></details>
+    </section>
+
+    <section class="band cta">
+      <div class="wrap">
+        <h2>Stop renting your own guests back.</h2>
+        <p>30 days free. Then $1,000, once, per location.</p>
+        <a class="btn primary" href="/signup">Start your free trial</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-foot">
+    <div class="wrap row between">
+      <span class="muted small">{{BRAND}} · reservations restaurants own · built to be open source</span>
+      <span class="small"><a href="/login">Log in</a> · <a href="mailto:{{SUPPORT_EMAIL}}">{{SUPPORT_EMAIL}}</a></span>
+    </div>
+  </footer>
+</body>
+</html>

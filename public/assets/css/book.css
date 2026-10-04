@@ -1,0 +1,238 @@
+/* Diner-facing pages: booking, manage, waitlist status. Mobile first. */
+
+body.booking {
+  background: var(--paper);
+}
+body.booking.embed {
+  background: var(--card);
+}
+
+.book-shell {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 28px 16px 40px;
+}
+.embed .book-shell {
+  padding: 14px 14px 20px;
+}
+
+.book-head {
+  text-align: center;
+  margin-bottom: 18px;
+}
+.book-head h1 {
+  font-size: 1.85rem;
+  margin-bottom: 4px;
+}
+.book-head p {
+  margin: 0;
+  font-size: 14px;
+}
+.book-head a {
+  color: inherit;
+}
+.embed .book-head h1 {
+  font-size: 1.35rem;
+}
+
+.book-card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 22px 20px;
+  box-shadow: var(--shadow);
+}
+.embed .book-card {
+  border: 0;
+  box-shadow: none;
+  padding: 4px 2px;
+}
+
+.step-title {
+  font-family: var(--sans);
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  margin: 18px 0 8px;
+  font-weight: 700;
+}
+.step-title:first-child {
+  margin-top: 0;
+}
+
+.pills {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 2px 2px 6px;
+  scrollbar-width: thin;
+}
+.pill {
+  flex: none;
+  min-width: 46px;
+  min-height: 44px;
+  padding: 6px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: var(--card);
+  color: var(--ink);
+  font: 600 15px/1.15 var(--sans);
+  cursor: pointer;
+}
+.pill:hover {
+  border-color: var(--brand);
+}
+.pill[aria-pressed='true'] {
+  background: var(--brand);
+  border-color: var(--brand);
+  color: #fff;
+}
+.pill.date {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 62px;
+  font-size: 13px;
+  font-weight: 500;
+}
+.pill.date b {
+  font-size: 17px;
+  font-weight: 700;
+}
+.pill.date.closed {
+  color: var(--muted);
+}
+
+.times {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
+  gap: 8px;
+}
+.time {
+  min-height: 46px;
+  border-radius: 10px;
+  border: 1px solid var(--brand);
+  background: color-mix(in srgb, var(--brand) 8%, var(--card));
+  color: var(--ink);
+  font: 700 15px/1 var(--sans);
+  cursor: pointer;
+}
+.time:hover {
+  background: var(--brand);
+  color: #fff;
+}
+.time[aria-pressed='true'] {
+  background: var(--brand);
+  color: #fff;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 18px 8px;
+  color: var(--muted);
+}
+.empty-state strong {
+  display: block;
+  color: var(--ink);
+  font-size: 16px;
+  margin-bottom: 6px;
+}
+.suggest {
+  margin-top: 12px;
+  text-align: left;
+}
+.suggest h4 {
+  font-family: var(--sans);
+  font-size: 14px;
+  margin: 12px 0 6px;
+}
+
+.summary-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  background: color-mix(in srgb, var(--brand) 9%, var(--card));
+  border: 1px solid color-mix(in srgb, var(--brand) 30%, var(--line));
+  border-radius: 10px;
+  padding: 10px 14px;
+  margin-bottom: 16px;
+  font-weight: 600;
+}
+.summary-line button {
+  font-weight: 600;
+}
+
+.confirm {
+  text-align: center;
+}
+.confirm .tick {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  margin: 4px auto 12px;
+  display: grid;
+  place-items: center;
+  background: color-mix(in srgb, var(--brand) 14%, var(--card));
+  color: var(--brand);
+  font-size: 30px;
+}
+.confirm .details {
+  text-align: left;
+  background: var(--line-2);
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin: 14px 0;
+}
+.confirm .details div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 4px 0;
+}
+.confirm .details span:first-child {
+  color: var(--muted);
+}
+.code {
+  font-family: var(--mono);
+  letter-spacing: 0.08em;
+  font-weight: 700;
+}
+
+.policy {
+  font-size: 13px;
+  color: var(--muted);
+  background: var(--line-2);
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+}
+
+.book-foot {
+  text-align: center;
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 18px;
+}
+.book-foot a {
+  color: inherit;
+}
+.embed .book-foot {
+  margin-top: 10px;
+}
+
+.hp {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.big-number {
+  font-size: 3.2rem;
+  font-weight: 650;
+  line-height: 1;
+  color: var(--brand);
+}
