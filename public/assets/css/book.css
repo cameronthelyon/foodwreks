@@ -83,10 +83,15 @@ body.booking.embed {
 .pill:hover {
   border-color: var(--brand);
 }
-.pill[aria-pressed='true'] {
+.pill[aria-pressed='true'],
+.pill.chosen {
   background: var(--brand);
   border-color: var(--brand);
   color: #fff;
+}
+select.pill {
+  width: auto;
+  padding-right: 8px;
 }
 .pill.date {
   display: flex;

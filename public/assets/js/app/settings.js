@@ -1,7 +1,7 @@
 // Settings: every configuration screen, plus the getting-started checklist.
 
 import { api, busy, checkbox, clear, confirmDialog, copyText, field, fmtDate, fmtHHMM, formValues, h, money, parseHHMM, toast, toastError, ago } from '../lib.js';
-import { can, loadDay, loadRestaurant, rApi, state } from './state.js';
+import { can, loadDay, loadRestaurant, rApi, state, today } from './state.js';
 
 const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -473,7 +473,7 @@ async function hours(el) {
   const closureForm = h(
     'form',
     { class: 'row', style: { alignItems: 'flex-end' } },
-    field('Date', h('input', { type: 'date', name: 'date', required: true, min: r().today })),
+    field('Date', h('input', { type: 'date', name: 'date', required: true, min: today() })),
     field('What', h('select', { name: 'closed' }, h('option', { value: '1' }, 'Closed all day'), h('option', { value: '0' }, 'Special hours'))),
     field('First seating', h('input', { name: 'start', placeholder: '17:00', style: { width: '90px' } })),
     field('Last seating', h('input', { name: 'last', placeholder: '21:00', style: { width: '90px' } })),
@@ -1018,9 +1018,15 @@ function data(el) {
 
 // ---- License -------------------------------------------------------------------------------------------
 
-function license(el, route) {
+// Back from Stripe with ?paid=1, the license flips when the payment webhook
+// lands, usually within seconds. Check every 3 s for 30 s, and only while
+// this screen is still open.
+const LICENSE_CHECKS = 10;
+
+function license(el, route, attempt = 0) {
   const l = r().license;
-  const paid = route.query.get('paid') === '1';
+  const waiting = route.query.get('paid') === '1' && l.kind !== 'lifetime';
+  const gaveUp = waiting && attempt >= LICENSE_CHECKS;
   const statusLine =
     l.kind === 'lifetime'
       ? h('p', { class: 'notice ok' }, `Lifetime license active${l.paidAt ? ` since ${new Date(l.paidAt).toLocaleDateString()}` : ''}. Thank you.`)
@@ -1031,12 +1037,25 @@ function license(el, route) {
           : l.active
             ? h('p', { class: 'notice' }, `Free trial: ${l.daysLeft} ${l.daysLeft === 1 ? 'day' : 'days'} left.`)
             : h('p', { class: 'notice warn' }, 'Trial ended. Online booking is paused; everything else keeps working, including exports.');
-  if (paid && l.kind !== 'lifetime') setTimeout(() => loadRestaurant().then(() => license(el, route)).catch(() => {}), 3000);
+  if (waiting && !gaveUp) {
+    setTimeout(() => {
+      const here = () => el.isConnected && location.hash.startsWith('#/settings/license');
+      if (here()) loadRestaurant().then(() => here() && license(el, route, attempt + 1), () => here() && license(el, route, attempt + 1));
+    }, 3000);
+  }
   clear(
     el,
     panel(
       'License',
-      paid && l.kind !== 'lifetime' ? h('p', { class: 'notice' }, 'Payment received. Activation takes a few seconds…') : null,
+      waiting
+        ? h(
+            'p',
+            { class: gaveUp ? 'notice warn' : 'notice' },
+            gaveUp
+              ? 'Payment received, but the activation has not come through yet. Refresh this page in a minute; if it still shows the trial, contact support and we will activate it by hand.'
+              : 'Payment received. Activation takes a few seconds…',
+          )
+        : null,
       statusLine,
       h('h2', { style: { margin: '6px 0' } }, `${money(l.priceCents)} once, per location`),
       h(

@@ -5,7 +5,27 @@ import { can, rApi, state } from './state.js';
 import { go } from './nav.js';
 import { openReservation, statusChip } from './reservation.js';
 
-let query = { q: '', tag: '', sort: 'recent', offset: 0 };
+// Filters survive leaving and coming back; paging never does (each full load
+// starts at the top, and "Show more" asks from the rows already on screen).
+let query = { q: '', tag: '', sort: 'recent' };
+
+// A clickable table row that keyboards can reach and open too.
+function linkRow(onOpen, ...cells) {
+  return h(
+    'tr',
+    {
+      class: 'clickable',
+      tabindex: 0,
+      onclick: onOpen,
+      onkeydown: (e) => {
+        if (e.target !== e.currentTarget || (e.key !== 'Enter' && e.key !== ' ')) return;
+        e.preventDefault();
+        onOpen();
+      },
+    },
+    ...cells,
+  );
+}
 
 export function render(root, route) {
   const results = h('div');
@@ -22,12 +42,15 @@ export function render(root, route) {
       ['name', 'Name'],
     ].map(([v, l]) => h('option', { value: v, selected: query.sort === v }, l)),
   );
-  const load = async (append = false) => {
+  let request = 0;
+  const load = async (offset = 0) => {
+    const mine = ++request;
     try {
-      const params = new URLSearchParams({ q: query.q, tag: query.tag, sort: query.sort, offset: String(query.offset), limit: '50' });
+      const params = new URLSearchParams({ q: query.q, tag: query.tag, sort: query.sort, offset: String(offset), limit: '50' });
       const data = await rApi(`/guests?${params}`);
-      paintTags(tagsEl, data.tags, load);
-      paintResults(results, data, append, load);
+      if (mine !== request) return; // a newer search or filter won
+      paintTags(tagsEl, data.tags, () => load());
+      paintResults(results, data, offset > 0, load);
     } catch (err) {
       toastError(err);
     }
@@ -35,12 +58,12 @@ export function render(root, route) {
   search.addEventListener(
     'input',
     debounce(() => {
-      query = { ...query, q: search.value.trim(), offset: 0 };
+      query = { ...query, q: search.value.trim() };
       load();
     }, 250),
   );
   sort.addEventListener('change', () => {
-    query = { ...query, sort: sort.value, offset: 0 };
+    query = { ...query, sort: sort.value };
     load();
   });
   clear(root, h('div', { class: 'row', style: { marginBottom: '10px' } }, h('div', { style: { flex: 1, minWidth: '220px' } }, search), sort), tagsEl, results);
@@ -51,16 +74,22 @@ export function render(root, route) {
 function paintTags(el, tags, reload) {
   clear(
     el,
-    tags.length ? h('button', { 'aria-pressed': String(!query.tag), onclick: () => ((query = { ...query, tag: '', offset: 0 }), reload()) }, 'All guests') : null,
-    tags.slice(0, 15).map((t) => h('button', { 'aria-pressed': String(query.tag === t), onclick: () => ((query = { ...query, tag: t, offset: 0 }), reload()) }, t)),
+    tags.length ? h('button', { 'aria-pressed': String(!query.tag), onclick: () => ((query = { ...query, tag: '' }), reload()) }, 'All guests') : null,
+    tags.slice(0, 15).map((t) => h('button', { 'aria-pressed': String(query.tag === t), onclick: () => ((query = { ...query, tag: t }), reload()) }, t)),
   );
 }
 
-function paintResults(el, data, append, reload) {
+// Opens in place (the list, its pages and the scroll position stay put); the
+// address still names the guest so it can be shared or reloaded.
+function showGuest(id) {
+  history.replaceState(null, '', `#/guests/${id}`);
+  openGuest(id);
+}
+
+function paintResults(el, data, append, load) {
   const rows = data.guests.map((g) =>
-    h(
-      'tr',
-      { class: 'clickable', onclick: () => go('guests', g.id) },
+    linkRow(
+      () => showGuest(g.id),
       h('td', {}, h('b', {}, g.name), h('div', { class: 'tagline' }, g.tags.slice(0, 4).map((t) => h('span', { class: 'chip' }, t)))),
       h('td', {}, fmtPhone(g.phone), h('div', { class: 'small muted' }, g.email || '')),
       h('td', {}, String(g.visit_count)),
@@ -87,7 +116,7 @@ function paintResults(el, data, append, reload) {
   el.querySelector('.more')?.remove();
   const shown = el.querySelectorAll('tbody tr').length;
   if (shown < data.total) {
-    el.append(h('p', { class: 'more' }, h('button', { class: 'btn', onclick: () => ((query.offset = shown), reload(true)) }, 'Show more')));
+    el.append(h('p', { class: 'more' }, h('button', { class: 'btn', onclick: () => load(shown) }, 'Show more')));
   }
 }
 
@@ -153,7 +182,20 @@ async function openGuest(id) {
           ? h(
               'table',
               { class: 'data' },
-              h('tbody', {}, data.reservations.map((r) => h('tr', { class: 'clickable', onclick: () => (m.close(), openReservation(r.id)) }, h('td', {}, fmtDate(r.date, { year: 'numeric', month: 'short', day: 'numeric' })), h('td', {}, r.timeLabel), h('td', {}, `${r.partySize} guests`), h('td', {}, statusChip(r.status)), h('td', { class: 'small muted' }, r.guestNotes || '')))),
+              h(
+                'tbody',
+                {},
+                data.reservations.map((r) =>
+                  linkRow(
+                    () => (m.close(), openReservation(r.id)),
+                    h('td', {}, fmtDate(r.date, { year: 'numeric', month: 'short', day: 'numeric' })),
+                    h('td', {}, r.timeLabel),
+                    h('td', {}, `${r.partySize} guests`),
+                    h('td', {}, statusChip(r.status)),
+                    h('td', { class: 'small muted' }, r.guestNotes || ''),
+                  ),
+                ),
+              ),
             )
           : h('p', { class: 'muted' }, 'No reservations yet.'),
       ),
@@ -167,7 +209,12 @@ async function openGuest(id) {
       debounce(async () => {
         const q = input.value.trim();
         if (q.length < 2) return clear(results);
-        const found = (await rApi(`/guests?q=${encodeURIComponent(q)}&limit=8`)).guests.filter((x) => x.id !== g.id);
+        let found;
+        try {
+          found = (await rApi(`/guests?q=${encodeURIComponent(q)}&limit=8`)).guests.filter((x) => x.id !== g.id);
+        } catch (err) {
+          return toastError(err);
+        }
         clear(
           results,
           found.map((x) =>

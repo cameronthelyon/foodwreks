@@ -1,10 +1,29 @@
 // Reservation detail/editor and the new-reservation form.
 
-import { $, ago, clear, confirmDialog, fmt12, fmtDate, fmtHHMM, h, modal, money, parseHHMM, toast, toastError, todayIn } from '../lib.js';
-import { can, HOLDING, loadDay, rApi, SOURCE, state, STATUS, tableNames } from './state.js';
+import { $, ago, clear, confirmDialog, fmt12, fmtDate, fmtHHMM, h, modal, money, serviceMinutes, serviceNowIn, toast, toastError } from '../lib.js';
+import { can, HOLDING, loadDay, rApi, SOURCE, state, STATUS, tableNames, today } from './state.js';
 import { go } from './nav.js';
 
 const OCCASIONS = ['', 'Birthday', 'Anniversary', 'Date night', 'Business', 'Celebration'];
+
+// Time inputs show a clock time but remember the exact service minute they
+// were filled with (last night's 12:30 AM is 1470; a shift that starts at
+// midnight has a real 1:00 AM at 60). Only a time the host types goes
+// through the 4 AM rule, so saving a note never moves a booking a day.
+function timeInput(minutes, attrs = {}) {
+  const input = h('input', { type: 'time', name: 'time', step: 300, ...attrs });
+  if (minutes != null) setTime(input, minutes);
+  return input;
+}
+function setTime(input, minutes) {
+  input.value = fmtHHMM(minutes % 1440);
+  input.dataset.minutes = String(minutes);
+}
+function readTime(input) {
+  const exact = input.dataset.minutes;
+  if (exact !== undefined && input.value === fmtHHMM(Number(exact) % 1440)) return Number(exact);
+  return serviceMinutes(input.value);
+}
 
 export function statusChip(status) {
   const s = STATUS[status] || { label: status, tone: '' };
@@ -67,11 +86,17 @@ export async function changeStatus(r, status, extra = {}) {
 
 export async function openReservation(id) {
   let data;
+  let floor;
   try {
     data = await rApi(`/reservations/${id}`);
+    // Opened from search or another day: load the floor ourselves rather than
+    // trust whatever day is (or is not) loaded, so tables never show as "?"
+    // and a save can never send an empty table list by accident.
+    floor = state.day?.date === data.reservation.date ? { tables: state.day.tables } : await rApi('/floor');
   } catch (err) {
     return toastError(err);
   }
+  const nameOf = (ids) => ids.map((tid) => floor.tables.find((t) => t.id === tid)?.name ?? '?').join('+');
   const body = h('div');
   const m = modal({ title: 'Reservation', wide: true, body });
   render();
@@ -108,7 +133,7 @@ export async function openReservation(id) {
         'p',
         { style: { fontSize: '1.05rem', margin: '6px 0 10px' } },
         h('b', {}, `${fmtDate(r.date, { weekday: 'long', month: 'long', day: 'numeric' })}, ${r.timeLabel}`),
-        ` · ${r.duration} min · ${r.tableIds.length ? `Table ${tableNames(r.tableIds)}` : 'No table yet'}`,
+        ` · ${r.duration} min · ${r.tableIds.length ? `Table ${nameOf(r.tableIds)}` : 'No table yet'}`,
       ),
       h(
         'div',
@@ -177,11 +202,14 @@ export async function openReservation(id) {
 
   function editForm(r) {
     const editable = HOLDING.has(r.status);
-    const tables = state.day?.tables.filter((t) => t.active) || [];
+    const tables = floor.tables.filter((t) => t.active || r.tableIds.includes(t.id));
+    let tablesTouched = false;
     const tableSelect = h(
       'select',
-      { name: 'tables', multiple: true, size: Math.min(6, Math.max(3, tables.length)), disabled: !editable },
-      tables.map((t) => h('option', { value: t.id, selected: r.tableIds.includes(t.id) }, `${t.name} (${t.min_covers}-${t.max_covers})${t.section ? ` · ${t.section}` : ''}`)),
+      { name: 'tables', multiple: true, size: Math.min(6, Math.max(3, tables.length)), disabled: !editable, onchange: () => (tablesTouched = true) },
+      tables.map((t) =>
+        h('option', { value: t.id, selected: r.tableIds.includes(t.id) }, `${t.name} (${t.min_covers}-${t.max_covers})${t.section ? ` · ${t.section}` : ''}${t.active ? '' : ' · retired'}`),
+      ),
     );
     const form = h(
       'form',
@@ -191,7 +219,7 @@ export async function openReservation(id) {
         'div',
         { class: 'grid-3' },
         h('label', { class: 'field' }, h('span', {}, 'Date'), h('input', { type: 'date', name: 'date', value: r.date, disabled: !editable })),
-        h('label', { class: 'field' }, h('span', {}, 'Time'), h('input', { type: 'time', name: 'time', value: fmtHHMM(r.time % 1440), step: 300, disabled: !editable })),
+        h('label', { class: 'field' }, h('span', {}, 'Time'), timeInput(r.time, { disabled: !editable })),
         h('label', { class: 'field' }, h('span', {}, 'Party'), h('input', { type: 'number', name: 'partySize', min: 1, max: 100, value: r.partySize, disabled: !editable })),
       ),
       h(
@@ -252,13 +280,13 @@ export async function openReservation(id) {
         notify: f.notify.checked,
       };
       if (editable) {
-        const time = parseHHMM(f.time.value);
+        const time = readTime(f.time);
         if (f.date.value !== r.date) patch.date = f.date.value;
-        if (time !== null && time !== r.time % 1440) patch.time = time;
+        if (time !== null && time !== r.time) patch.time = time;
         if (Number(f.partySize.value) !== r.partySize) patch.partySize = Number(f.partySize.value);
         if (Number(f.duration.value) !== r.duration) patch.duration = Number(f.duration.value);
         const chosen = [...tableSelect.selectedOptions].map((o) => Number(o.value)).sort((a, b) => a - b);
-        if (chosen.join() !== [...r.tableIds].sort((a, b) => a - b).join()) patch.tableIds = chosen;
+        if (tablesTouched && chosen.join() !== [...r.tableIds].sort((a, b) => a - b).join()) patch.tableIds = chosen;
       }
       await save(r, patch);
     });
@@ -315,7 +343,7 @@ function historyPanel(data) {
 
 // New reservation (phone, walk-in, or from an empty timeline cell).
 export function newReservation(prefill = {}) {
-  const isToday = (prefill.date || state.date) === state.restaurant.today;
+  const isToday = (prefill.date || state.date) === today();
   const tables = state.day?.tables.filter((t) => t.active) || [];
   const slotsEl = h('div', { class: 'row', style: { gap: '6px', marginBottom: '12px' } });
   const guestEl = h('div');
@@ -327,7 +355,7 @@ export function newReservation(prefill = {}) {
       { class: 'grid-3' },
       h('label', { class: 'field' }, h('span', {}, 'Date'), h('input', { type: 'date', name: 'date', value: prefill.date || state.date, required: true })),
       h('label', { class: 'field' }, h('span', {}, 'Party'), h('input', { type: 'number', name: 'partySize', min: 1, max: 100, value: prefill.partySize || 2, required: true })),
-      h('label', { class: 'field' }, h('span', {}, 'Time'), h('input', { type: 'time', name: 'time', step: 300, value: prefill.time != null ? fmtHHMM(prefill.time % 1440) : '', required: true })),
+      h('label', { class: 'field' }, h('span', {}, 'Time'), timeInput(prefill.time, { required: true })),
     ),
     slotsEl,
     h(
@@ -378,7 +406,7 @@ export function newReservation(prefill = {}) {
     if (!date || !party) return;
     try {
       const data = await rApi(`/availability?date=${date}&party=${party}`);
-      const now = date === state.restaurant.today;
+      const now = date === today();
       clear(
         slotsEl,
         data.closed ? h('span', { class: 'chip warn' }, data.message || 'Closed: you can still book') : null,
@@ -392,7 +420,7 @@ export function newReservation(prefill = {}) {
                 type: 'button',
                 class: `btn small ${s.available ? '' : 'danger'}`,
                 title: s.available ? `${s.warnings.includes('pacing') ? 'Over pacing limit. ' : ''}Table ${tableNames(s.tableIds || [])}` : 'No table free',
-                onclick: () => (f.time.value = fmtHHMM(s.time % 1440)),
+                onclick: () => setTime(f.time, s.time),
               },
               `${s.label}${s.warnings.includes('pacing') ? ' !' : ''}${s.available ? '' : ' ×'}`,
             ),
@@ -404,14 +432,10 @@ export function newReservation(prefill = {}) {
     }
   };
   const setNow = () => {
-    const d = new Date();
-    const parts = new Intl.DateTimeFormat('en-US', { timeZone: state.restaurant.timezone, hourCycle: 'h23', hour: '2-digit', minute: '2-digit' }).formatToParts(d);
-    const hh = parts.find((p) => p.type === 'hour').value;
-    const mm = parts.find((p) => p.type === 'minute').value;
-    // A walk-in happens now, on the restaurant's calendar, whatever day the
-    // host happens to be viewing.
-    f.date.value = todayIn(state.restaurant.timezone);
-    f.time.value = `${hh}:${mm}`;
+    // Now, on the current service day: 12:10 AM belongs to last night.
+    const sn = serviceNowIn(state.restaurant.timezone);
+    f.date.value = sn.date;
+    setTime(f.time, sn.minutes);
     f.source.value = 'walkin';
     if ([...f.status.options].some((o) => o.value === 'seated')) f.status.value = 'seated';
     f.notify.checked = false;
@@ -442,7 +466,7 @@ export function newReservation(prefill = {}) {
     e.preventDefault();
     const err = $('#nr-err', form);
     err.hidden = true;
-    const time = parseHHMM(f.time.value);
+    const time = readTime(f.time);
     if (time === null) return ((err.textContent = 'Pick a time.'), (err.hidden = false));
     if (!f.name.value.trim()) return ((err.textContent = 'Enter a name.'), (err.hidden = false));
     const body = {

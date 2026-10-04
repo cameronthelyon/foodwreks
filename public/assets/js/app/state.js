@@ -1,6 +1,6 @@
 // App-wide state and data loading. Views subscribe to events on `bus`.
 
-import { api } from '../lib.js';
+import { api, serviceNowIn } from '../lib.js';
 
 export const state = {
   me: null,
@@ -67,3 +67,8 @@ export const tableNames = (ids = []) => (ids.length ? ids.map(tableName).join('+
 
 const RANK = { host: 1, manager: 2, owner: 3 };
 export const can = (minRole) => RANK[state.restaurant?.role] >= RANK[minRole];
+
+// The current service day in the restaurant's time zone (it turns over at
+// 4 AM, not midnight). Always computed fresh, so the app follows the clock.
+export const today = () => serviceNowIn(state.restaurant.timezone).date;
+export const nowServiceMinutes = () => serviceNowIn(state.restaurant.timezone).minutes;

@@ -209,3 +209,21 @@ test('malformed table lists are a 400, not a crash', async () => {
   const res = await c.patch(`/api/r/${rid}/reservations/${made.data.reservation.id}`, { tableIds: '3' });
   assert.equal(res.status, 400);
 });
+
+test('a DELETE with no body needs no content type, but still must be same-origin', async () => {
+  const { c, rid } = await signup(t);
+  const made = await c.post(`/api/r/${rid}/closures`, { date: '2026-12-25', closed: true, note: 'Holiday' });
+  assert.equal(made.status, 200);
+  const id = made.data.closure.id;
+  const cookie = [...c.jar].map(([k, v]) => `${k}=${v}`).join('; ');
+  const raw = (headers) => fetch(`${t.base}/api/r/${rid}/closures/${id}`, { method: 'DELETE', headers: { cookie, ...headers } });
+
+  assert.equal((await raw({ origin: 'https://evil.example' })).status, 403, 'cross-site is refused even without a body');
+  const res = await raw({});
+  assert.equal(res.status, 200, 'what fetch(url, { method: "DELETE" }) sends');
+  assert.equal((await c.get(`/api/r/${rid}/closures`)).data.length, 0);
+
+  // A bodiless POST is still a mutation that forms can send cross-site: JSON stays required.
+  const post = await fetch(`${t.base}/api/r/${rid}/closures`, { method: 'POST', headers: { cookie } });
+  assert.equal(post.status, 415);
+});

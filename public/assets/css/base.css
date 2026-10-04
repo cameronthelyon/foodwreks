@@ -601,6 +601,13 @@ table.data tr.clickable {
 table.data tr.clickable:hover td {
   background: var(--line-2);
 }
+/* Outlines on table rows render unevenly across browsers: tint the cells too. */
+table.data tr.clickable:focus-visible {
+  outline-offset: -3px;
+}
+table.data tr.clickable:focus-visible td {
+  background: var(--accent-soft);
+}
 
 .logo {
   display: inline-flex;

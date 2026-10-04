@@ -3,7 +3,7 @@
 // tooltips and a table view under each, so no value hides behind a hover.
 
 import { addDays, clear, fmt12, fmtDate, h, money, pct, toastError } from '../lib.js';
-import { rApi, SOURCE, state } from './state.js';
+import { rApi, SOURCE, today as serviceToday } from './state.js';
 
 const SVG = 'http://www.w3.org/2000/svg';
 function svg(tag, attrs = {}, ...children) {
@@ -16,7 +16,7 @@ function svg(tag, attrs = {}, ...children) {
 let range = null;
 
 export function render(root) {
-  const today = state.restaurant.today;
+  const today = serviceToday();
   range ||= { preset: '30', from: addDays(today, -29), to: today };
   const body = h('div', { class: 'reports-body' });
   const filters = h('div', { class: 'row', style: { marginBottom: '14px' } });

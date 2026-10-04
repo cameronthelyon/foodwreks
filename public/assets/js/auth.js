@@ -7,6 +7,17 @@ const app = $('#app');
 const mode = location.pathname.slice(1) || 'login';
 const params = new URLSearchParams(location.search);
 
+// Only same-origin paths: "//evil.example" or "/\\evil" must not leave the site.
+function safeNext(next) {
+  if (!next) return '/app';
+  try {
+    const u = new URL(next, location.origin);
+    return u.origin === location.origin && next.startsWith('/') && !next.startsWith('//') ? u.pathname + u.search + u.hash : '/app';
+  } catch {
+    return '/app';
+  }
+}
+
 const input = (name, label, attrs = {}) => h('label', { class: 'field' }, h('span', {}, label), h('input', { name, ...attrs }));
 const error = () => h('p', { class: 'notice danger', id: 'err', hidden: true });
 
@@ -59,7 +70,7 @@ const views = {
       ),
       async (v) => {
         await api('/api/auth/login', { method: 'POST', body: v });
-        location.href = params.get('next')?.startsWith('/') ? params.get('next') : '/app';
+        location.href = safeNext(params.get('next'));
       },
     );
   },

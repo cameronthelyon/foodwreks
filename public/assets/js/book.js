@@ -55,20 +55,36 @@ function renderUnavailable() {
   clear(app, h('div', { class: 'empty-state' }, h('strong', {}, 'Online booking is not available right now.'), r.phone ? h('p', {}, 'Please call ', h('a', { href: `tel:${r.phone}` }, r.phone), '.') : null));
 }
 
-function renderPicker() {
+// `notice` explains why the guest is back here (their time just went).
+function renderPicker(notice) {
   const r = state.restaurant;
   const parties = [];
   for (let n = r.minPartySize; n <= Math.min(r.maxPartySize, 12); n++) parties.push(n);
+  const larger = [];
+  for (let n = Math.max(13, r.minPartySize); n <= r.maxPartySize; n++) larger.push(n);
+  const pickParty = (n) => {
+    state.party = n;
+    state.time = null;
+    renderPicker();
+    loadTimes();
+  };
   const days = [];
   for (let i = 0; i < Math.min(21, r.bookingWindowDays + 1); i++) days.push(addDays(state.today, i));
 
   const partyPills = h(
     'div',
     { class: 'pills', role: 'group', 'aria-label': 'Party size' },
-    parties.map((n) =>
-      h('button', { type: 'button', class: 'pill', 'aria-pressed': String(state.party === n), onclick: () => ((state.party = n), (state.time = null), renderPicker(), loadTimes()) }, String(n)),
-    ),
-    h('button', { type: 'button', class: 'pill', 'aria-pressed': String(state.party > r.maxPartySize), onclick: () => ((state.party = r.maxPartySize + 1), renderPicker(), loadTimes()) }, `${r.maxPartySize + 1}+`),
+    parties.map((n) => h('button', { type: 'button', class: 'pill', 'aria-pressed': String(state.party === n), onclick: () => pickParty(n) }, String(n))),
+    // Pills stop at 12; bigger parties the restaurant still books online pick from a list.
+    larger.length
+      ? h(
+          'select',
+          { class: `pill${larger.includes(state.party) ? ' chosen' : ''}`, 'aria-label': 'Larger party size', onchange: (e) => pickParty(Number(e.target.value)) },
+          h('option', { value: '', disabled: true, selected: !larger.includes(state.party) }, larger.length > 1 ? `${larger[0]} to ${larger.at(-1)}` : String(larger[0])),
+          larger.map((n) => h('option', { value: n, selected: state.party === n }, String(n))),
+        )
+      : null,
+    h('button', { type: 'button', class: 'pill', 'aria-pressed': String(state.party > r.maxPartySize), onclick: () => pickParty(r.maxPartySize + 1) }, `${r.maxPartySize + 1}+`),
   );
 
   const datePills = h(
@@ -101,6 +117,7 @@ function renderPicker() {
 
   clear(
     app,
+    notice ? h('p', { class: 'notice warn', role: 'alert' }, notice) : null,
     h('h2', { class: 'step-title' }, 'Party size'),
     partyPills,
     h('h2', { class: 'step-title' }, 'Date'),
@@ -109,7 +126,10 @@ function renderPicker() {
     h('h2', { class: 'step-title' }, `Times for ${fmtDate(state.date, { weekday: 'long', month: 'long', day: 'numeric' })}`),
     h('div', { id: 'times' }, h('p', { class: 'muted' }, 'Checking tables…')),
   );
-  setTimeout(() => app.querySelector('.pill[aria-pressed="true"]')?.scrollIntoView({ block: 'nearest', inline: 'center' }), 0);
+  setTimeout(() => {
+    app.querySelector('.pill[aria-pressed="true"], .pill.chosen')?.scrollIntoView({ block: 'nearest', inline: 'center' });
+    if (notice) app.querySelector('[role=alert]')?.scrollIntoView({ block: 'nearest' });
+  }, 0);
 }
 
 async function loadTimes() {
@@ -293,8 +313,13 @@ function renderDetails(time) {
     } catch (e2) {
       button.disabled = false;
       button.textContent = cardNeeded() ? 'Continue to hold with a card' : 'Confirm reservation';
+      // The time went while they typed: back to the times that are open now.
+      if (e2.status === 409 && e2.code === 'unavailable') {
+        renderPicker(e2.message);
+        loadTimes();
+        return;
+      }
       showError(err, e2.message);
-      if (e2.status === 409 && e2.code === 'unavailable') loadTimes();
     }
   });
   clear(app, form);

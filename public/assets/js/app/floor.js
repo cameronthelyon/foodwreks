@@ -1,8 +1,8 @@
 // Floor timeline: tables down the side, time across. Drag a party sideways
 // to change its time, up or down to move tables; tap an empty slot to book.
 
-import { clear, confirmDialog, fmt12, h, nowMinutesIn, toast, toastError } from '../lib.js';
-import { HOLDING, loadDay, on, rApi, state } from './state.js';
+import { clear, confirmDialog, fmt12, h, toast, toastError } from '../lib.js';
+import { HOLDING, loadDay, nowServiceMinutes, on, rApi, state, today } from './state.js';
 import { newReservation, openReservation } from './reservation.js';
 
 const SLOT_W = 30; // px per 15 minutes
@@ -41,7 +41,7 @@ function paint(root) {
   const { start, end } = range(day);
   const width = ((end - start) / 15) * SLOT_W;
   const x = (min) => ((min - start) / 15) * SLOT_W;
-  const isToday = day.date === state.restaurant.today;
+  const isToday = day.date === today();
   const visible = day.reservations.filter((r) => SHOWN.has(r.status));
   const usedTables = new Set(visible.flatMap((r) => r.tableIds));
   const tables = day.tables.filter((t) => t.active || usedTables.has(t.id));
@@ -107,7 +107,7 @@ function paint(root) {
     }
   }
 
-  const nowMin = isToday ? nowMinutesIn(state.restaurant.timezone) : null;
+  const nowMin = isToday ? nowServiceMinutes() : null;
   const timeline = h(
     'div',
     { class: 'timeline' },

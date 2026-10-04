@@ -1,8 +1,8 @@
 // "The book": tonight's reservations as a list grouped by time, with
 // one-tap status changes and a pacing strip.
 
-import { clear, fmt12, fmtPhone, h, nowMinutesIn } from '../lib.js';
-import { on, SOURCE, state, tableNames } from './state.js';
+import { clear, fmt12, fmtPhone, h } from '../lib.js';
+import { nowServiceMinutes, on, SOURCE, state, tableNames, today } from './state.js';
 import { changeStatus, guestFlags, newReservation, nextActions, openReservation, statusChip } from './reservation.js';
 
 let filter = null;
@@ -30,8 +30,8 @@ export function render(root) {
 function paint(root) {
   const day = state.day;
   if (!day) return;
-  const isToday = day.date === state.restaurant.today;
-  const nowMin = isToday ? nowMinutesIn(state.restaurant.timezone) : null;
+  const isToday = day.date === today();
+  const nowMin = isToday ? nowServiceMinutes() : null;
   if (!filter) filter = isToday ? 'upcoming' : 'all';
   const counts = Object.fromEntries(Object.entries(FILTERS).map(([k, f]) => [k, day.reservations.filter(f.test).length]));
   const list = day.reservations.filter(FILTERS[filter].test);
@@ -94,7 +94,14 @@ function row(r, nowMin) {
   const actions = nextActions(r);
   return h(
     'div',
-    { class: `res-row status-${r.status} ${['completed', 'cancelled', 'no_show'].includes(r.status) ? 'dim' : ''}`, onclick: () => openReservation(r.id), role: 'button', tabindex: '0', onkeydown: (e) => e.key === 'Enter' && openReservation(r.id) },
+    {
+      class: `res-row status-${r.status} ${['completed', 'cancelled', 'no_show'].includes(r.status) ? 'dim' : ''}`,
+      onclick: () => openReservation(r.id),
+      role: 'button',
+      tabindex: '0',
+      // Only the row itself: Enter on its Seat or Arrived button must not also open the dialog.
+      onkeydown: (e) => e.target === e.currentTarget && (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), openReservation(r.id)),
+    },
     h('div', { class: 'party', title: `Party of ${r.partySize}` }, String(r.partySize)),
     h(
       'div',

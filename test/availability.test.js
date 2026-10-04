@@ -251,6 +251,25 @@ test('late reservations from the previous service date spill into this one', () 
   assert.equal(slotAt(r, '02:00').available, true);
 });
 
+test('a party seated since last night still holds its table at 1 AM, on either day\'s book', () => {
+  const tables = [TABLES[0]];
+  // Friday 11 PM for 90 minutes: planned to leave at 12:30 AM, still seated at 1:00.
+  const lingering = { ...res('23:00', 2, [1], { status: 'seated' }), date: '2026-10-09', duration_min: 90 };
+  const oneAm = zonedToUtc('2026-10-10', hm('01:00'), TZ);
+  // Friday's book (the current service day at 1 AM): now is minute 1500.
+  const friday = computeAvailability(
+    ctx({ date: '2026-10-09', tables, combos: [], reservations: [lingering], nowMs: oneAm, channel: 'staff', closure: { closed: 0, start_min: hm('22:00'), last_seating_min: hm('26:00'), note: '' } }),
+  );
+  assert.equal(slotAt(friday, '25:00').available, false); // held until now + 15
+  assert.equal(slotAt(friday, '25:30').available, true);
+  // Saturday's book: the same moment is minute 60.
+  const saturday = computeAvailability(
+    ctx({ tables, combos: [], reservations: [lingering], nowMs: oneAm, channel: 'staff', closure: { closed: 0, start_min: 0, last_seating_min: hm('03:00'), note: '' } }),
+  );
+  assert.equal(slotAt(saturday, '01:00').available, false);
+  assert.equal(slotAt(saturday, '01:30').available, true);
+});
+
 test('unassigned reservations still consume capacity', () => {
   const tables = TABLES.slice(0, 2); // two 2-tops
   const reservations = [res('18:00', 2), res('18:00', 2)];

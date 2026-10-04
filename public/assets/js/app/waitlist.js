@@ -1,25 +1,50 @@
 // Walk-in waitlist: add with an automatic quote, text when ready, seat.
+// Always the current service day, whatever date the book is showing: this
+// view loads its own copy of today's floor and never moves state.date.
 
 import { clear, debounce, fmtPhone, h, modal, toast, toastError } from '../lib.js';
-import { loadDay, on, rApi, state } from './state.js';
+import { emit, on, rApi, state, today } from './state.js';
 import { go } from './nav.js';
 
+let live = null; // today's /day payload: tables, reservations, waitlist
+
+// After any change here: this view and the nav badge both re-fetch (live
+// events do the same for changes made on other devices).
+const announce = () => emit('waitlist-changed', today());
+
 export function render(root) {
-  if (state.date !== state.restaurant.today) {
-    state.date = state.restaurant.today;
-    state.day = null;
-    loadDay().catch(toastError);
-  }
-  const form = addForm();
   const list = h('div', { id: 'wl-list' });
-  clear(root, h('div', { class: 'panel' }, h('h3', {}, 'Add a party'), form), list);
-  const draw = () => paintList(list);
-  const off = on('day', draw);
-  const tick = setInterval(draw, 30_000);
-  if (state.day?.date === state.date) draw();
+  let request = 0;
+  const reload = debounce(async () => {
+    const mine = ++request;
+    try {
+      const data = await rApi(`/day/${today()}`);
+      if (mine !== request) return;
+      live = data;
+      paintList(list);
+    } catch (err) {
+      toastError(err);
+    }
+  }, 150);
+  clear(root, h('div', { class: 'panel' }, h('h3', {}, 'Add a party'), addForm()), list);
+  live = state.day?.date === today() ? state.day : null;
+  if (live) paintList(list);
+  reload();
+  const offs = [
+    on('waitlist-changed', (e) => (!e.detail || e.detail === today()) && reload()),
+    // The book is on today too: reuse its fresh copy (it follows reservation events).
+    on('day', () => {
+      if (state.day?.date !== today()) return;
+      live = state.day;
+      paintList(list);
+    }),
+  ];
+  // Re-fetch, not just repaint: the 4 AM turnover and missed events both land here.
+  const tick = setInterval(reload, 30_000);
   return () => {
-    off();
+    offs.forEach((off) => off());
     clearInterval(tick);
+    request++;
   };
 }
 
@@ -64,7 +89,7 @@ function addForm() {
       party.value = 2;
       estimate();
       f.name.focus();
-      loadDay();
+      announce();
     } catch (err) {
       toastError(err);
     }
@@ -73,7 +98,8 @@ function addForm() {
 }
 
 function paintList(root) {
-  const entries = state.day?.waitlist || [];
+  if (!root.isConnected || !live) return;
+  const entries = live.waitlist;
   const open = entries.filter((w) => ['waiting', 'notified'].includes(w.status));
   const closed = entries.filter((w) => !['waiting', 'notified'].includes(w.status));
   const smsReady = Boolean(state.restaurant.messaging.sms);
@@ -98,7 +124,7 @@ function entry(w, position, smsReady) {
   const act = async (path, body = {}) => {
     try {
       await rApi(`/waitlist/${w.id}/${path}`, { method: 'POST', body });
-      loadDay();
+      announce();
     } catch (err) {
       toastError(err);
     }
@@ -130,15 +156,15 @@ function entry(w, position, smsReady) {
             h('button', { class: 'btn small danger', onclick: () => act('remove', { status: 'left' }) }, 'Left'),
           ]
         : w.status === 'seated' && w.reservationId
-          ? h('button', { class: 'btn small ghost', onclick: () => go('book', state.date) }, 'View')
+          ? h('button', { class: 'btn small ghost', onclick: () => go('book', live.date) }, 'View')
           : h('button', { class: 'btn small ghost', onclick: () => act('remove', { status: 'waiting' }) }, 'Restore'),
     ),
   );
 }
 
 function seat(w) {
-  const tables = state.day.tables.filter((t) => t.active && w.partySize <= t.max_covers);
-  const busy = new Set(state.day.reservations.filter((r) => r.status === 'seated').flatMap((r) => r.tableIds));
+  const tables = live.tables.filter((t) => t.active && w.partySize <= t.max_covers);
+  const busy = new Set(live.reservations.filter((r) => r.status === 'seated').flatMap((r) => r.tableIds));
   const select = h(
     'select',
     { name: 'table' },
@@ -159,7 +185,7 @@ function seat(w) {
             await rApi(`/waitlist/${w.id}/seat`, { method: 'POST', body: { tableIds: select.value ? [Number(select.value)] : [] } });
             close();
             toast(`${w.name} seated`, 'ok');
-            loadDay();
+            announce();
           } catch (err) {
             toastError(err);
           }

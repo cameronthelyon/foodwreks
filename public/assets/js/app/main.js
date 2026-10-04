@@ -1,10 +1,10 @@
 // Staff app shell: auth, routing, top bar, live updates, search, shortcuts.
 
-import { $, addDays, api, applyTheme, clear, debounce, fmtDate, fmtPhone, h, toastError } from '../lib.js';
-import { can, loadDay, loadRestaurant, on, rApi, state, STATUS } from './state.js';
+import { $, addDays, api, applyTheme, clear, debounce, fmtDate, fmtPhone, h, modal, toastError } from '../lib.js';
+import { can, emit, loadDay, loadRestaurant, on, rApi, state, STATUS, today } from './state.js';
 import { icon } from './icons.js';
 import { newReservation, openReservation } from './reservation.js';
-import { go, setDate } from './nav.js';
+import { DATED, go, setDate } from './nav.js';
 import * as bookView from './book.js';
 import * as floorView from './floor.js';
 import * as waitlistView from './waitlist.js';
@@ -49,8 +49,9 @@ async function boot() {
   }
   state.rid = state.me.memberships.some((m) => m.restaurantId === saved) ? saved : state.me.memberships[0].restaurantId;
   await loadRestaurant();
-  state.date = state.restaurant.today;
+  state.date = today();
   renderShell();
+  watchServiceDay();
   window.addEventListener('hashchange', route);
   route();
   connectEvents();
@@ -58,8 +59,9 @@ async function boot() {
     renderBanner();
     $('#r-switch') && ($('#r-switch').value = String(state.rid));
   });
-  on('day', updateCounts);
+  on('waitlist-changed', (e) => (!e.detail || e.detail === today()) && updateCounts());
   on('date', updateTopbar);
+  updateCounts();
 }
 
 function parseHash() {
@@ -112,7 +114,7 @@ function renderShell() {
           },
           state.me.memberships.map((m) => h('option', { value: m.restaurantId, selected: m.restaurantId === state.rid }, m.name)),
         )
-      : h('div', { class: 'small muted', style: { padding: '0 10px 10px', fontWeight: 600 } }, state.restaurant.name),
+      : h('div', { class: 'small muted r-name', style: { padding: '0 10px 10px', fontWeight: 600 } }, state.restaurant.name),
     Object.entries(VIEWS)
       .filter(([, v]) => !v.role || can(v.role))
       .map(([key, v]) =>
@@ -160,8 +162,8 @@ function updateTopbar() {
   const def = VIEWS[state.route.view];
   const top = $('#topbar');
   if (!top) return;
-  const today = state.restaurant.today;
-  const isToday = state.date === today;
+  const current = today();
+  const isToday = state.date === current;
   const dateLabel = isToday ? 'Today' : fmtDate(state.date, { weekday: 'short', month: 'short', day: 'numeric' });
   clear(
     top,
@@ -172,7 +174,7 @@ function updateTopbar() {
           h('button', { class: 'btn ghost small', 'aria-label': 'Previous day', onclick: () => setDate(addDays(state.date, -1)) }, icon('left')),
           h('span', { class: 'label' }, dateLabel),
           h('button', { class: 'btn ghost small', 'aria-label': 'Next day', onclick: () => setDate(addDays(state.date, 1)) }, icon('right')),
-          isToday ? null : h('button', { class: 'btn small', onclick: () => setDate(today) }, 'Today'),
+          isToday ? null : h('button', { class: 'btn small', onclick: () => setDate(current) }, 'Today'),
           h('input', { type: 'date', value: state.date, 'aria-label': 'Pick a date', onchange: (e) => e.target.value && setDate(e.target.value) }),
         )
       : h('h1', {}, def.label),
@@ -180,7 +182,54 @@ function updateTopbar() {
     searchBox(),
     h('span', { class: `live ${events?.readyState === 1 ? 'on' : ''}`, id: 'live', title: 'Live updates' }),
     h('button', { class: 'btn primary', onclick: () => newReservation({ date: state.date }) }, icon('plus'), 'New'),
+    h('button', { class: 'btn ghost small mobile-only', 'aria-label': 'Account menu', onclick: accountMenu }, '\u22ef'),
   );
+}
+
+// Phones and portrait tablets hide the sidebar footer; same actions here.
+function accountMenu() {
+  const m = modal({
+    title: state.me.user.name || state.me.user.email,
+    body: h(
+      'div',
+      { class: 'stack' },
+      state.me.memberships.length > 1
+        ? h(
+            'label',
+            { class: 'field' },
+            h('span', {}, 'Restaurant'),
+            h(
+              'select',
+              {
+                onchange: (e) => {
+                  try {
+                    localStorage.setItem('rid', e.target.value);
+                  } catch {
+                    /* ignore */
+                  }
+                  location.hash = '#/book';
+                  location.reload();
+                },
+              },
+              state.me.memberships.map((x) => h('option', { value: x.restaurantId, selected: x.restaurantId === state.rid }, x.name)),
+            ),
+          )
+        : h('p', { class: 'muted small', style: { margin: 0 } }, state.restaurant.name),
+      h('button', { class: 'btn block', onclick: () => (cycleTheme(), m.close()) }, 'Switch theme'),
+      state.me.user.isPlatformAdmin ? h('a', { class: 'btn block', href: '/admin' }, 'Admin') : null,
+      h(
+        'button',
+        {
+          class: 'btn block danger',
+          onclick: async () => {
+            await api('/api/auth/logout', { method: 'POST', body: {} }).catch(() => {});
+            location.href = '/login';
+          },
+        },
+        'Log out',
+      ),
+    ),
+  });
 }
 
 function searchBox() {
@@ -201,7 +250,10 @@ function searchBox() {
               onclick: () => {
                 results.hidden = true;
                 input.value = '';
-                if (r.date !== state.date) setDate(r.date);
+                // The book and floor follow it to its day; other screens stay
+                // put (the dialog loads its own floor), so a quick lookup
+                // from the waitlist lands back on the waitlist.
+                if (DATED.has(state.route.view) && r.date !== state.date) go(state.route.view, r.date);
                 openReservation(r.id);
               },
             },
@@ -226,9 +278,27 @@ function searchBox() {
     }
   }, 220);
   input.addEventListener('input', run);
-  input.addEventListener('keydown', (e) => e.key === 'Escape' && ((results.hidden = true), input.blur()));
-  input.addEventListener('blur', () => setTimeout(() => (results.hidden = true), 200));
-  return h('div', { class: 'search' }, icon('search'), input, results);
+  const wrap = h('div', { class: 'search' }, icon('search'), input, results);
+  const items = () => [...results.querySelectorAll('button')];
+  wrap.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      results.hidden = true;
+      input.focus();
+    } else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      const list = items();
+      if (!list.length || results.hidden) return;
+      e.preventDefault();
+      const i = list.indexOf(document.activeElement);
+      const next = e.key === 'ArrowDown' ? Math.min(list.length - 1, i + 1) : i <= 0 ? -1 : i - 1;
+      (next < 0 ? input : list[next]).focus();
+    }
+  });
+  // Hide only when focus leaves the whole search box, so Tab and arrows can
+  // reach the results.
+  wrap.addEventListener('focusout', (e) => {
+    if (!wrap.contains(e.relatedTarget)) setTimeout(() => !wrap.contains(document.activeElement) && (results.hidden = true), 150);
+  });
+  return wrap;
 }
 
 function renderBanner() {
@@ -248,29 +318,58 @@ function renderBanner() {
   if (!state.restaurant.onlineBooking && l.active) el.appendChild(h('div', { class: 'notice warn', style: { marginTop: '8px' } }, 'Online booking is switched off in Settings.'));
 }
 
-function updateCounts() {
-  const n = state.day?.waitlist.filter((w) => ['waiting', 'notified'].includes(w.status)).length || 0;
-  const el = $('#wl-count');
-  if (el) el.textContent = n ? String(n) : '';
-}
+// The Waitlist badge counts today's open parties, whatever day the book shows.
+const updateCounts = debounce(async () => {
+  try {
+    const list = await rApi(`/waitlist?date=${today()}`);
+    const n = list.filter((w) => ['waiting', 'notified'].includes(w.status)).length;
+    const el = $('#wl-count');
+    if (el) el.textContent = n ? String(n) : '';
+  } catch {
+    /* keep the last count */
+  }
+}, 300);
 
 function connectEvents() {
   events?.close();
   events = new EventSource(`/api/r/${state.rid}/events`);
   const live = (on) => $('#live')?.classList.toggle('on', on);
-  events.onopen = () => live(true);
-  events.onerror = () => live(false);
   const refresh = debounce(() => loadDay().catch(() => {}), 300);
+  // Events missed while disconnected are not replayed, so every (re)connect
+  // reloads what is on screen.
+  events.onopen = () => {
+    live(true);
+    refresh();
+    emit('waitlist-changed');
+  };
+  events.onerror = () => live(false);
   for (const type of ['reservations', 'waitlist']) {
     events.addEventListener(type, (e) => {
       const data = JSON.parse(e.data || '{}');
       if (!data.date || data.date === state.date) refresh();
+      if (type === 'waitlist') emit('waitlist-changed', data.date);
     });
   }
+  document.addEventListener('visibilitychange', () => document.visibilityState === 'visible' && (refresh(), emit('waitlist-changed')));
+  setInterval(() => document.visibilityState === 'visible' && refresh(), 120_000);
   events.addEventListener('config', () => {
     loadRestaurant().catch(() => {});
     refresh();
   });
+}
+
+// At the 4 AM turnover, a host still looking at "today" moves to the new day.
+function watchServiceDay() {
+  let last = today();
+  setInterval(() => {
+    const now = today();
+    if (now === last) return;
+    const wasToday = state.date === last;
+    last = now;
+    if (wasToday) setDate(now);
+    else updateTopbar();
+    emit('waitlist-changed', now);
+  }, 60_000);
 }
 
 function cycleTheme() {
@@ -303,7 +402,7 @@ function shortcuts(e) {
     $('#search')?.focus();
   } else if (VIEWS[state.route.view].dated && e.key === 'ArrowLeft') setDate(addDays(state.date, -1));
   else if (VIEWS[state.route.view].dated && e.key === 'ArrowRight') setDate(addDays(state.date, 1));
-  else if (e.key === 't') setDate(state.restaurant.today);
+  else if (e.key === 't') setDate(today());
 }
 
 boot().catch((err) => {

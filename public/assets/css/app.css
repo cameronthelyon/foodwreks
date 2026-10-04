@@ -877,7 +877,15 @@ body.app {
 
 /* ---- Responsive -------------------------------------------------------------- */
 
+/* Shown only where the side nav (and its account links) is hidden. */
+.mobile-only {
+  display: none;
+}
+
 @media (max-width: 900px) {
+  .mobile-only {
+    display: inline-flex;
+  }
   .shell {
     grid-template-columns: 1fr;
   }
@@ -897,6 +905,7 @@ body.app {
   }
   .nav .logo,
   .nav select,
+  .nav .r-name,
   .nav .foot,
   .nav .count {
     display: none;
@@ -907,8 +916,10 @@ body.app {
     font-size: 11px;
     padding: 6px 6px;
   }
+  /* minmax(0, ...) lets wide tables scroll inside their panel instead of
+     stretching the page sideways. */
   .settings {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
   .subnav {
     position: static;

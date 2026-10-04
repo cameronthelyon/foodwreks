@@ -132,9 +132,9 @@ function renderChange() {
   clear(
     app,
     h('h2', { class: 'step-title' }, 'Party size'),
-    h('input', { type: 'number', min: r.minPartySize, max: r.maxPartySize, value: state.party, style: { maxWidth: '120px' }, onchange: (e) => ((state.party = Number(e.target.value)), loadTimes()) }),
+    h('input', { type: 'number', 'aria-label': 'Party size', min: r.minPartySize, max: r.maxPartySize, value: state.party, style: { maxWidth: '120px' }, onchange: (e) => ((state.party = Number(e.target.value)), loadTimes()) }),
     h('h2', { class: 'step-title' }, 'Date'),
-    h('input', { type: 'date', min: today, max: addDays(today, r.bookingWindowDays), value: state.date, style: { maxWidth: '200px' }, onchange: (e) => e.target.value && ((state.date = e.target.value), loadTimes()) }),
+    h('input', { type: 'date', 'aria-label': 'Date', min: today, max: addDays(today, r.bookingWindowDays), value: state.date, style: { maxWidth: '200px' }, onchange: (e) => e.target.value && ((state.date = e.target.value), loadTimes()) }),
     h('h2', { class: 'step-title' }, 'Pick a new time'),
     timesEl,
     h('p', { style: { marginTop: '16px' } }, h('button', { class: 'btn ghost', onclick: render }, 'Keep my reservation as is')),

@@ -44,6 +44,8 @@ test/                     node:test suites over real HTTP with a fake clock and 
 
 Restaurants think in local wall-clock time, so the system of record is a **service date** (`YYYY-MM-DD`) plus **minutes from local midnight**. A seating at 12:30 AM that belongs to Friday's service is Friday at minute 1470. UTC instants are derived only where a real clock matters (reminders, "too soon to book" checks). DST is handled with `Intl.DateTimeFormat` and tested on both transition days.
 
+**The service day turns over at 4 AM, not midnight** (`serviceNow` in `lib/time.js`, `serviceNowIn` in the browser). At 1:10 AM Saturday the host stand is still on Friday, at minute 1510: walk-ins, waitlist parties and the "now" line all land on Friday's book, and the app moves to the new day by itself at 4 AM. Times typed before 4 AM in staff forms read the same way (12:30 AM is minute 1470 of the date shown). Guests are the exception: the public booking page shows calendar dates, because "Today" at 1 AM Saturday means Saturday to a diner.
+
 ## Availability engine (`lib/availability.js`)
 
 Pure functions; everything arrives in a context object, so it is exhaustively unit-tested.
@@ -65,7 +67,7 @@ Guest counters (visits, no-shows, late cancels, spend) are **recomputed** from r
 
 - **Passwords:** scrypt (N=16384, r=8, p=1), minimum 10 characters. **Sessions:** random 256-bit token in an HttpOnly, SameSite=Lax cookie (Secure on https); the database stores only its SHA-256. Sliding 30-day expiry.
 - **Tenant isolation:** every staff route resolves the restaurant through the caller's membership. A restaurant you are not on returns 404, not 403, so ids cannot be probed. Roles: host < manager < owner.
-- **CSRF:** API mutations require a JSON content type (forces a CORS preflight we never grant) and a same-origin `Origin` header when present.
+- **CSRF:** API mutations require a JSON content type (forces a CORS preflight we never grant) and a same-origin `Origin` header when present. The one exception is a `DELETE` with no body, which needs no content type: browsers cannot send `DELETE` cross-site without a preflight, and forms cannot send it at all. It still must be same-origin.
 - **Headers:** strict CSP (no inline script), `frame-ancestors 'none'` everywhere except booking, manage and waitlist pages (embeddable by design), nosniff, referrer policy, HSTS on https.
 - **Manage links** are `HMAC(secret, code + per-booking salt)`. A database leak alone reveals none, reminders can rebuild them days later, and rotating the salt revokes one link.
 - **Webhooks:** Square HMAC-SHA256 over URL + body; Stripe timestamped signatures with a 5-minute tolerance; Clover auth code; Google HTTP Basic.
@@ -96,13 +98,14 @@ All idempotent and safe to run late or twice.
 
 ## Testing
 
-`npm test` runs ~70 tests in under 3 seconds: the availability engine (DST, overlap, pacing, combos, repack, spillover), every HTTP flow (booking, manage, staff, roles, isolation, CSRF), imports and exports, reports, notifications (providers, retries, reminders), integrations (Stripe, Toast, Square, Clover, Google) with every outbound call faked, and page rendering. Tests use a fake clock, an in-memory database, and a recorded fake `fetch`. No test touches the network.
+`npm test` runs 87 tests in under 4 seconds: the availability engine (DST, overlap, pacing, combos, repack, spillover), every HTTP flow (booking, manage, staff, roles, isolation, CSRF), imports and exports, reports, notifications (providers, retries, reminders), integrations (Stripe, Toast, Square, Clover, Google) with every outbound call faked, and page rendering. Tests use a fake clock, an in-memory database, and a recorded fake `fetch`. No test touches the network. `test/regressions.test.js` holds one test per bug found in review, each shown to fail before its fix.
 
 ## Known limits
 
 - `node:sqlite` is marked experimental in Node 22 (the warning is silenced in npm scripts). The API used here is the basic, stable surface; track Node release notes and prefer the current LTS.
 - English only. Phone normalization defaults to US/Canada formats; other countries need `+` international numbers.
-- The host stand's "today" turns over at midnight. Late seatings stay on their service date (minute 1470 is 12:30 AM), but a bar open until 2 AM sees the next day's book after midnight.
+- The service day turns over at 4 AM for every restaurant. A venue that seats past 4 AM (rare) would need that boundary as a setting.
+- After midnight, online guests cannot book into the previous night's late seatings (the public page has moved to the new calendar day). Staff can.
 - One location per restaurant record. Groups run each location separately (each needs its own license anyway).
 - No floor-plan drawing: tables are a list with sections. The timeline is the spatial view.
 - Integrations are unit-tested against documented APIs, not yet against live sandboxes. See INTEGRATIONS.md.

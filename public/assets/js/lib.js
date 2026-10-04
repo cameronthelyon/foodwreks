@@ -46,9 +46,9 @@ export class ApiError extends Error {
 
 export async function api(path, { method = 'GET', body, signal } = {}) {
   const init = { method, headers: { Accept: 'application/json' }, credentials: 'same-origin', signal };
-  if (body !== undefined) {
+  if (body !== undefined || method !== 'GET') {
     init.headers['Content-Type'] = 'application/json';
-    init.body = JSON.stringify(body);
+    init.body = JSON.stringify(body ?? {});
   }
   let res;
   try {
@@ -112,6 +112,23 @@ export function todayIn(tz) {
   return parts.slice(0, 10);
 }
 
+// Same rule as the server: before 4 AM it is still the previous service day,
+// at minutes past 24:00 (12:30 AM is minute 1470 of the night before).
+export const SERVICE_DAY_START = 4 * 60;
+
+export function serviceNowIn(tz) {
+  const date = todayIn(tz);
+  const minutes = nowMinutesIn(tz);
+  return minutes < SERVICE_DAY_START ? { date: addDays(date, -1), minutes: minutes + 1440 } : { date, minutes };
+}
+
+// A clock time typed by staff ("00:30") -> service-day minutes (1470).
+export function serviceMinutes(hhmm) {
+  const m = parseHHMM(hhmm);
+  if (m === null) return null;
+  return m < SERVICE_DAY_START ? m + 1440 : m;
+}
+
 export function nowMinutesIn(tz) {
   const p = new Intl.DateTimeFormat('en-US', { timeZone: tz, hourCycle: 'h23', hour: '2-digit', minute: '2-digit' }).formatToParts(new Date());
   const get = (t) => Number(p.find((x) => x.type === t)?.value || 0);
@@ -164,16 +181,28 @@ export function toastError(err) {
 // Modal dialog with focus handling. Returns { close, el }.
 // initialFocus: a selector inside the dialog. Without one the dialog itself
 // takes focus, so opening a record never pops a keyboard or date picker.
+const openDialogs = [];
+
 export function modal({ title, body, actions = [], wide = false, onClose, initialFocus } = {}) {
   const previous = document.activeElement;
+  let closed = false;
   const close = () => {
+    if (closed) return;
+    closed = true;
     backdrop.remove();
     document.removeEventListener('keydown', onKey);
+    openDialogs.splice(openDialogs.indexOf(dialog), 1);
     previous?.focus?.();
     onClose?.();
   };
+  // Stacked dialogs (a confirm over an editor): only the top one listens, so
+  // one Escape never discards the editor underneath.
   const onKey = (e) => {
-    if (e.key === 'Escape') close();
+    if (openDialogs[openDialogs.length - 1] !== dialog) return;
+    if (e.key === 'Escape') {
+      e.stopPropagation();
+      close();
+    }
     if (e.key === 'Tab') {
       const items = $$('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])', dialog).filter((x) => !x.disabled && x.offsetParent);
       if (!items.length) return;
@@ -206,6 +235,7 @@ export function modal({ title, body, actions = [], wide = false, onClose, initia
   );
   const backdrop = h('div', { class: 'backdrop', onmousedown: (e) => e.target === backdrop && close() }, dialog);
   document.body.appendChild(backdrop);
+  openDialogs.push(dialog);
   document.addEventListener('keydown', onKey);
   setTimeout(() => ((initialFocus && $(initialFocus, dialog)) || dialog).focus(), 0);
   return { close, el: dialog };
