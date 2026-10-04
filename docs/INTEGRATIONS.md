@@ -32,7 +32,7 @@ Sync runs every 5 minutes, and on webhook where available, with a 15-minute over
 
 - **Access:** "Standard API access," which the restaurant provisions itself: Toast Web → Integrations → Toast API access → Manage credentials. Needs an employee with the Manage Integrations permission and RMS Essentials or higher. Read-only.
 - **Scopes:** `orders:read`, `config:read`, and `guest.pi:read` (without it, checks have no customer details and matching falls back to tables).
-- **Paste into Settings → POS & Google:** client ID, client secret, restaurant GUID, and the API hostname Toast shows with the credentials.
+- **Paste into Settings → POS & Google:** client ID, client secret, restaurant GUID, and the API hostname Toast shows with the credentials (it must be an `https://…toasttab.com` address; anything else is refused).
 - **Calls:** `POST /authentication/v1/authentication/login` (`userAccessType: TOAST_MACHINE_CLIENT`), `GET /orders/v2/ordersBulk` with the `Toast-Restaurant-External-ID` header (filters on *modified* time), `GET /config/v2/tables/{guid}` for table names (cached).
 - **Rate limits:** 20 requests/second overall; ordersBulk 5/second per location.
 - **UNVERIFIED:** default hostnames (`ws-api.toasttab.com`, sandbox `ws-sandbox-api.eng.toasttab.com`); whether `totalAmount` includes tip.

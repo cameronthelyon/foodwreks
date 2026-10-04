@@ -1,6 +1,6 @@
 // Reservation detail/editor and the new-reservation form.
 
-import { $, ago, clear, confirmDialog, fmt12, fmtDate, fmtHHMM, h, modal, money, parseHHMM, toast, toastError } from '../lib.js';
+import { $, ago, clear, confirmDialog, fmt12, fmtDate, fmtHHMM, h, modal, money, parseHHMM, toast, toastError, todayIn } from '../lib.js';
 import { can, HOLDING, loadDay, rApi, SOURCE, state, STATUS, tableNames } from './state.js';
 import { go } from './nav.js';
 
@@ -408,6 +408,9 @@ export function newReservation(prefill = {}) {
     const parts = new Intl.DateTimeFormat('en-US', { timeZone: state.restaurant.timezone, hourCycle: 'h23', hour: '2-digit', minute: '2-digit' }).formatToParts(d);
     const hh = parts.find((p) => p.type === 'hour').value;
     const mm = parts.find((p) => p.type === 'minute').value;
+    // A walk-in happens now, on the restaurant's calendar, whatever day the
+    // host happens to be viewing.
+    f.date.value = todayIn(state.restaurant.timezone);
     f.time.value = `${hh}:${mm}`;
     f.source.value = 'walkin';
     if ([...f.status.options].some((o) => o.value === 'seated')) f.status.value = 'seated';

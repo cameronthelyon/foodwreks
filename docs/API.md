@@ -67,7 +67,7 @@ Base URL: the server's `BASE_URL`. All bodies are JSON. Mutations must send `Con
 
 - `200` booked: `{ "code": "UHD5MWS2", "status": "booked", "manageUrl": "https://…/m/UHD5MWS2?t=…", "reservation": { … } }`. Give the person the `manageUrl`: it is their only way to change or cancel online.
 - `200` card required: `{ "code": "…", "status": "pending", "checkoutUrl": "https://checkout.stripe.com/…" }`. The table is held for 20 minutes while the person saves a card.
-- `409` the slot is gone (`unavailable`), or the person already holds a booking that day (`duplicate`). Re-check availability.
+- `409` the slot is gone (`unavailable`), or the person already holds an active booking at this restaurant that day (`duplicate`; checked only after everything else passes, and the reply never says when the other booking is). Re-check availability, or use the existing booking's manage link.
 - `400` validation (`invalid`), `403` online booking unavailable (`booking_unavailable`), `429` rate limited.
 
 Errors always look like `{ "error": { "code": "unavailable", "message": "That time just filled up. Please pick another." } }`. The message is written for people; show it as is.

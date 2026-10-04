@@ -69,7 +69,9 @@ Guest counters (visits, no-shows, late cancels, spend) are **recomputed** from r
 - **Headers:** strict CSP (no inline script), `frame-ancestors 'none'` everywhere except booking, manage and waitlist pages (embeddable by design), nosniff, referrer policy, HSTS on https.
 - **Manage links** are `HMAC(secret, code + per-booking salt)`. A database leak alone reveals none, reminders can rebuild them days later, and rotating the salt revokes one link.
 - **Webhooks:** Square HMAC-SHA256 over URL + body; Stripe timestamped signatures with a 5-minute tolerance; Clover auth code; Google HTTP Basic.
-- **Abuse:** per-IP rate limits on every public endpoint, a honeypot field, one active booking per phone/email per restaurant per day, and login throttling per IP and per account.
+- **Abuse:** per-IP rate limits on every public endpoint, a honeypot field, one active booking per phone/email per restaurant per day, and login throttling per IP and per account. The one-booking rule is checked only after a request is otherwise valid and bookable, and its error never reveals the other booking's time, so it cannot be used to look up someone's plans. Behind `TRUST_PROXY=1`, the client IP is the last `X-Forwarded-For` entry (the one the proxy appended).
+- **Input boundaries:** the public booking endpoint copies an explicit list of fields; source tags from links never grant anything, and external references, statuses and staff notes are server-side only. Shifts and special hours are range-checked on save and clamped again inside the engine, so no stored row can make slot generation run long.
+- **Outbound calls:** Toast API hosts must be `https://*.toasttab.com`, and access tokens are cached per host, client id and secret, so credentials one restaurant enters can never cause another restaurant's token to be sent anywhere.
 - **Exports** neutralize spreadsheet formulas (cells starting with `= + - @`) while keeping phone numbers readable.
 
 ## Background jobs (`lib/worker.js`)
@@ -100,6 +102,7 @@ All idempotent and safe to run late or twice.
 
 - `node:sqlite` is marked experimental in Node 22 (the warning is silenced in npm scripts). The API used here is the basic, stable surface; track Node release notes and prefer the current LTS.
 - English only. Phone normalization defaults to US/Canada formats; other countries need `+` international numbers.
+- The host stand's "today" turns over at midnight. Late seatings stay on their service date (minute 1470 is 12:30 AM), but a bar open until 2 AM sees the next day's book after midnight.
 - One location per restaurant record. Groups run each location separately (each needs its own license anyway).
 - No floor-plan drawing: tables are a list with sections. The timeline is the spatial view.
 - Integrations are unit-tested against documented APIs, not yet against live sandboxes. See INTEGRATIONS.md.

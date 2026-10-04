@@ -52,7 +52,7 @@ function render() {
       h(
         'div',
         { class: 'details' },
-        h('div', {}, h('span', {}, 'When'), h('span', {}, `${fmtDate(v.date, { weekday: 'long', month: 'long', day: 'numeric' })}, ${v.timeLabel}`)),
+        h('div', {}, h('span', {}, 'When'), h('span', {}, `${fmtDate(v.displayDate || v.date, { weekday: 'long', month: 'long', day: 'numeric' })}, ${v.timeLabel}`)),
         h('div', {}, h('span', {}, 'Name'), h('span', {}, v.name)),
         v.notes ? h('div', {}, h('span', {}, 'Notes'), h('span', {}, v.notes)) : null,
         h('div', {}, h('span', {}, 'Confirmation'), h('span', { class: 'code' }, v.code)),
