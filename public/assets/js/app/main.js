@@ -1,6 +1,6 @@
 // Staff app shell: auth, routing, top bar, live updates, search, shortcuts.
 
-import { $, addDays, api, applyTheme, clear, debounce, fmtDate, h, toastError } from '../lib.js';
+import { $, addDays, api, applyTheme, clear, debounce, fmtDate, fmtPhone, h, toastError } from '../lib.js';
 import { can, loadDay, loadRestaurant, on, rApi, state, STATUS } from './state.js';
 import { icon } from './icons.js';
 import { newReservation, openReservation } from './reservation.js';
@@ -215,7 +215,7 @@ function searchBox() {
             'button',
             { onclick: () => ((results.hidden = true), (input.value = ''), go('guests', g.id)) },
             h('b', {}, g.name),
-            h('div', { class: 'small muted' }, [g.phone, g.email, `${g.visit_count} visits`].filter(Boolean).join(' · ')),
+            h('div', { class: 'small muted' }, [fmtPhone(g.phone), g.email, `${g.visit_count} visits`].filter(Boolean).join(' · ')),
           ),
         ),
         !data.reservations.length && !data.guests.length ? h('p', { class: 'muted small', style: { padding: '10px 12px', margin: 0 } }, 'No matches.') : null,

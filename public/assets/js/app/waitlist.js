@@ -1,6 +1,6 @@
 // Walk-in waitlist: add with an automatic quote, text when ready, seat.
 
-import { clear, debounce, h, modal, toast, toastError } from '../lib.js';
+import { clear, debounce, fmtPhone, h, modal, toast, toastError } from '../lib.js';
 import { loadDay, on, rApi, state } from './state.js';
 import { go } from './nav.js';
 
@@ -116,7 +116,7 @@ function entry(w, position, smsReady) {
         { class: 'small muted' },
         ['waiting', 'notified'].includes(w.status) ? h('span', { class: over ? 'late' : '' }, `Waiting ${waited} min`) : null,
         w.quotedMin ? ` · quoted ${w.quotedMin}` : '',
-        w.phone ? ` · ${w.phone}` : '',
+        w.phone ? ` · ${fmtPhone(w.phone)}` : '',
         w.notes ? ` · ${w.notes}` : '',
       ),
     ),

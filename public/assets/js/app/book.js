@@ -1,7 +1,7 @@
 // "The book": tonight's reservations as a list grouped by time, with
 // one-tap status changes and a pacing strip.
 
-import { clear, fmt12, h, nowMinutesIn } from '../lib.js';
+import { clear, fmt12, fmtPhone, h, nowMinutesIn } from '../lib.js';
 import { on, SOURCE, state, tableNames } from './state.js';
 import { changeStatus, guestFlags, newReservation, nextActions, openReservation, statusChip } from './reservation.js';
 
@@ -105,7 +105,7 @@ function row(r, nowMin) {
         { class: 'meta' },
         h('span', {}, `${fmt12(r.time)} · ${r.tableIds.length ? `Table ${tableNames(r.tableIds)}` : 'No table'}`),
         h('span', {}, SOURCE[r.source] || r.source),
-        r.phone ? h('span', {}, r.phone) : null,
+        r.phone ? h('span', {}, fmtPhone(r.phone)) : null,
         r.guestNotes ? h('span', { class: 'note' }, `“${r.guestNotes.slice(0, 80)}”`) : null,
         r.staffNotes ? h('span', {}, `Staff: ${r.staffNotes.slice(0, 60)}`) : null,
         r.card?.status === 'on_file' ? h('span', {}, 'Card on file') : null,

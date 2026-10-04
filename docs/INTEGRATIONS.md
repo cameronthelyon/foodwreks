@@ -97,7 +97,7 @@ Booking pages also carry schema.org `Restaurant` + `ReserveAction` structured da
 
 ### Watch: AI agents
 
-Google's AI Mode books restaurants through named partners (OpenTable, Resy, Tock). How a new provider joins is not documented. The defensive move is an open, documented booking API so any agent can book member restaurants. The public JSON endpoints already exist; publishing them (and an MCP server) is on the roadmap.
+Google's AI Mode books restaurants through named partners (OpenTable, Resy, Tock). How a new provider joins is not documented. The defensive move is an open, documented booking API so any agent can book member restaurants: see [API.md](API.md). An MCP server wrapping it is the next step.
 
 ---
 

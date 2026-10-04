@@ -57,6 +57,11 @@
     if (e.key === 'Escape') close();
   }
 
+  // Escape pressed inside the booking frame arrives as a message.
+  window.addEventListener('message', function (e) {
+    if (e.origin === new URL(BASE).origin && e.data && e.data.type === 'freehold:close') close();
+  });
+
   button.addEventListener('click', function () {
     lastFocus = document.activeElement;
     overlay = document.createElement('div');

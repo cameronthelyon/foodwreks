@@ -497,28 +497,34 @@ body.app {
   color: var(--muted);
   white-space: nowrap;
 }
-.tl-block.status-booked {
+.tl-block.status-booked,
+.tl-swatch.status-booked {
   background: color-mix(in srgb, var(--info) 14%, var(--card));
   border-color: color-mix(in srgb, var(--info) 35%, transparent);
 }
-.tl-block.status-confirmed {
+.tl-block.status-confirmed,
+.tl-swatch.status-confirmed {
   background: color-mix(in srgb, var(--info) 24%, var(--card));
   border-color: var(--info);
 }
-.tl-block.status-arrived {
+.tl-block.status-arrived,
+.tl-swatch.status-arrived {
   background: var(--warn-soft);
   border-color: var(--warn);
 }
-.tl-block.status-seated {
+.tl-block.status-seated,
+.tl-swatch.status-seated {
   background: var(--ok-soft);
   border-color: var(--ok);
 }
-.tl-block.status-completed {
+.tl-block.status-completed,
+.tl-swatch.status-completed {
   background: var(--line-2);
   border-color: var(--line);
   opacity: 0.75;
 }
-.tl-block.status-pending {
+.tl-block.status-pending,
+.tl-swatch.status-pending {
   background: var(--violet-soft);
   border-color: var(--violet);
 }
@@ -549,7 +555,7 @@ body.app {
   margin-bottom: 10px;
   align-items: center;
 }
-.legend i {
+.legend .tl-swatch {
   display: inline-block;
   width: 12px;
   height: 12px;

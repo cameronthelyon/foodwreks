@@ -5,7 +5,14 @@ import { $, addDays, api, applyTheme, clear, fmt12, fmtDate, h, parseHHMM, toast
 applyTheme();
 const params = new URLSearchParams(location.search);
 const embed = params.get('embed') === '1';
-if (embed) document.body.classList.add('embed');
+if (embed) {
+  document.body.classList.add('embed');
+  // Key presses inside the frame never reach the host page, so tell the
+  // widget to close on Escape. The message carries no data.
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !document.querySelector('.backdrop')) window.parent.postMessage({ type: 'freehold:close' }, '*');
+  });
+}
 const slug = document.body.dataset.slug;
 const SOURCES = ['google', 'instagram', 'website'];
 const source = SOURCES.includes(params.get('ref')) ? params.get('ref') : embed ? 'website' : 'online';

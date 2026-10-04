@@ -131,7 +131,7 @@ function paint(root) {
         ['arrived', 'Arrived'],
         ['seated', 'Seated'],
         ['completed', 'Done'],
-      ].map(([s, label]) => h('span', {}, h('i', { class: `tl-block status-${s}`, style: { position: 'static', display: 'inline-block', width: '12px', height: '12px', padding: 0 } }), label)),
+      ].map(([s, label]) => h('span', {}, h('i', { class: `tl-swatch status-${s}` }), label)),
       h('span', { class: 'spacer' }),
       h('span', {}, 'Drag to move · tap an empty slot to book'),
     ),

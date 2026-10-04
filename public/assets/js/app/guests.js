@@ -1,6 +1,6 @@
 // Guest book: search, tags, profiles, history, merge duplicates.
 
-import { clear, confirmDialog, debounce, fmtDate, h, modal, money, toast, toastError } from '../lib.js';
+import { clear, confirmDialog, debounce, fmtDate, fmtPhone, h, modal, money, toast, toastError } from '../lib.js';
 import { can, rApi, state } from './state.js';
 import { go } from './nav.js';
 import { openReservation, statusChip } from './reservation.js';
@@ -62,7 +62,7 @@ function paintResults(el, data, append, reload) {
       'tr',
       { class: 'clickable', onclick: () => go('guests', g.id) },
       h('td', {}, h('b', {}, g.name), h('div', { class: 'tagline' }, g.tags.slice(0, 4).map((t) => h('span', { class: 'chip' }, t)))),
-      h('td', {}, g.phone || '', h('div', { class: 'small muted' }, g.email || '')),
+      h('td', {}, fmtPhone(g.phone), h('div', { class: 'small muted' }, g.email || '')),
       h('td', {}, String(g.visit_count)),
       h('td', {}, g.no_show_count ? h('span', { class: 'chip danger' }, String(g.no_show_count)) : '0'),
       h('td', {}, g.total_spend_cents ? money(g.total_spend_cents) : ''),

@@ -54,6 +54,7 @@ Production deployment, backups, restore drills, onboarding and cutover checklist
 | [ARCHITECTURE.md](docs/ARCHITECTURE.md) | How it works: time model, availability engine, security, jobs |
 | [INTEGRATIONS.md](docs/INTEGRATIONS.md) | POS, Stripe, Google, email and texting setup, plus validation status |
 | [OPERATIONS.md](docs/OPERATIONS.md) | READ-DO checklists for running the service |
+| [API.md](docs/API.md) | The public booking API for websites, partners and AI agents |
 
 ## Status: what is and is not proven
 

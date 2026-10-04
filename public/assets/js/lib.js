@@ -138,6 +138,12 @@ export function ago(ms) {
 
 export const plural = (n, word, many = `${word}s`) => `${n} ${n === 1 ? word : many}`;
 
+// "+15105551016" -> "(510) 555-1016" for display; other countries stay as stored.
+export function fmtPhone(e164) {
+  const m = /^\+1(\d{3})(\d{3})(\d{4})$/.exec(String(e164 || ''));
+  return m ? `(${m[1]}) ${m[2]}-${m[3]}` : e164 || '';
+}
+
 // ---- Feedback ---------------------------------------------------------------
 
 let toastHost;
