@@ -14,7 +14,7 @@ Open http://localhost:3000. A demo restaurant (Juniper & Rye) loads with a month
 
 | What | Where |
 |---|---|
-| Marketing page | http://localhost:3000 |
+| Marketing site | http://localhost:3000 (also /pricing, /compare, /co-op, /switch) |
 | Diner booking page | http://localhost:3000/r/juniper-rye |
 | Host stand | http://localhost:3000/login as `demo@freeheld.test` / `freeheld-demo` |
 | Host-only account | `host@freeheld.test` / `freeheld-demo` |
@@ -58,7 +58,7 @@ Production deployment, backups, restore drills, onboarding and cutover checklist
 
 ## Status: what is and is not proven
 
-- **Proven by tests:** the availability engine, every booking and host-stand flow, roles and tenant isolation, imports and exports, reports, notifications, and the integration request shapes. `npm test` runs 89 tests in under 4 seconds.
+- **Proven by tests:** the availability engine, every booking and host-stand flow, roles and tenant isolation, imports and exports, reports, notifications, and the integration request shapes. `npm test` runs 92 tests in under 4 seconds.
 - **Driven in a real browser:** booking, manage, host stand, floor drag-and-drop, waitlist, guests, settings, import.
 - **Not yet proven:** no integration has run against a live sandbox (Toast, Square, Clover, Stripe, Google, Postmark, Twilio). Budget a day each before a pilot depends on one. Google booking-inside-Google needs Google's partner approval.
 - **Decided:** the name Freeheld on freeheld.io; AGPL-3.0 license; operated as a cooperative owned by member restaurants (see STRATEGY.md and BRAND.md). **Still open:** trademark search.

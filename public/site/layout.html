@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{TITLE}}</title>
+  <meta name="description" content="{{DESCRIPTION}}">
+  <link rel="canonical" href="{{CANONICAL}}">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="{{BRAND}}">
+  <meta property="og:title" content="{{TITLE}}">
+  <meta property="og:description" content="{{DESCRIPTION}}">
+  <meta property="og:url" content="{{CANONICAL}}">
+  <meta property="og:image" content="{{BASE_URL}}/assets/og.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/assets/css/base.css">
+  <link rel="stylesheet" href="/assets/css/site.css">
+  <script type="application/ld+json">{{JSONLD_RAW}}</script>
+  <script type="module" src="/assets/js/site.js"></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="site-nav">
+    <a class="logo" href="/"><svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#1F4D3F"/><path d="M10 6h12v20l-6-4.6L10 26z" fill="#F6F2EA"/></svg>{{BRAND}}</a>
+    <nav aria-label="Main">
+      <a href="/pricing">Pricing</a>
+      <a href="/compare">Compare</a>
+      <a href="/co-op">Co-op</a>
+      <a href="/switch">Switching</a>
+      <a href="/login">Log in</a>
+    </nav>
+    <a class="btn primary small nav-cta" href="/signup">Start free trial</a>
+  </header>
+
+  <main id="main">
+{{CONTENT_RAW}}
+  </main>
+
+  <footer class="site-foot">
+    <div class="wrap foot-grid">
+      <div>
+        <a class="logo" href="/"><svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#1F4D3F"/><path d="M10 6h12v20l-6-4.6L10 26z" fill="#F6F2EA"/></svg>{{BRAND}}</a>
+        <p class="small muted">Reservations restaurants own. Pay once, no cover fees, no rent.</p>
+      </div>
+      <nav aria-label="Product">
+        <h4>Product</h4>
+        <a href="/#how">How it works</a>
+        <a href="/pricing">Pricing</a>
+        <a href="/switch">Switching guide</a>
+        <a href="/signup">Start free trial</a>
+      </nav>
+      <nav aria-label="Compare">
+        <h4>Compare</h4>
+        <a href="/compare/opentable">vs OpenTable</a>
+        <a href="/compare/resy">vs Resy</a>
+        <a href="/compare/tock">vs Tock</a>
+        <a href="/compare/yelp">vs Yelp Guest Manager</a>
+      </nav>
+      <nav aria-label="About">
+        <h4>About</h4>
+        <a href="/co-op">Co-op and open source</a>
+        <a href="{{SOURCE_URL}}" rel="noopener">Source code (AGPL-3.0)</a>
+        <a href="mailto:{{SUPPORT_EMAIL}}">{{SUPPORT_EMAIL}}</a>
+        <a href="/login">Log in</a>
+      </nav>
+    </div>
+  </footer>
+</body>
+</html>

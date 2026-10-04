@@ -42,6 +42,9 @@
 .site-nav nav a:not(.btn):hover {
   color: var(--accent);
 }
+.site-nav nav {
+  margin-left: auto;
+}
 
 .hero {
   max-width: 1080px;
@@ -241,16 +244,204 @@ details p {
   .wrap.three {
     grid-template-columns: 1fr;
   }
-  .site-nav nav a:not(.btn):not([href='/login']) {
-    display: none;
+  /* Every page stays one tap away: the links move to their own scrolling row. */
+  .site-nav {
+    flex-wrap: wrap;
+    row-gap: 10px;
+  }
+  .site-nav nav {
+    order: 3;
+    width: 100%;
+    min-width: 0;
+    overflow-x: auto;
+    gap: 16px;
+    padding-bottom: 4px;
+  }
+  .site-nav nav a {
+    white-space: nowrap;
+  }
+  .compare-cards,
+  .foot-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 @media (max-width: 560px) {
+  .compare-cards,
+  .foot-grid,
   .features,
   .calc-out {
     grid-template-columns: 1fr;
   }
   .mock {
     transform: none;
+  }
+}
+
+/* ---- Inner pages ------------------------------------------------------------- */
+
+.skip {
+  position: absolute;
+  left: -999px;
+}
+.skip:focus {
+  left: 12px;
+  top: 12px;
+  z-index: 10;
+  background: var(--card);
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+}
+.site-nav nav a[aria-current='page'] {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 6px;
+}
+.page-head {
+  padding-top: 32px;
+  padding-bottom: 40px;
+}
+.page-head h1 {
+  font-size: clamp(2.1rem, 4.6vw, 3.3rem);
+  line-height: 1.08;
+  letter-spacing: -0.015em;
+  max-width: 22ch;
+  margin-bottom: 14px;
+}
+.page-head .lede {
+  max-width: 62ch;
+}
+.page-head .row {
+  margin-top: 20px;
+}
+.crumbs {
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 18px;
+}
+.crumbs a {
+  color: var(--muted);
+}
+.prose {
+  max-width: 780px;
+}
+.prose h2 {
+  margin-top: 36px;
+}
+.prose h2:first-child {
+  margin-top: 0;
+}
+.prose p,
+.prose li {
+  color: var(--ink-2);
+  line-height: 1.6;
+}
+.prose li b,
+.prose p b {
+  color: var(--ink);
+}
+.checks {
+  list-style: none;
+  padding: 0;
+}
+.checks li {
+  position: relative;
+  padding-left: 26px;
+  margin-bottom: 10px;
+}
+.checks li::before {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 0.55em;
+  width: 9px;
+  height: 9px;
+  border-radius: 2px;
+  background: var(--accent);
+}
+.note {
+  border-left: 3px solid var(--accent);
+  background: var(--accent-soft);
+  padding: 10px 14px;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+.small-h {
+  font-size: 1rem;
+  margin-top: 40px;
+}
+.sources {
+  padding-left: 18px;
+}
+.compare-cards {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+.compare-cards .card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-decoration: none;
+  color: var(--ink);
+  border: 1px solid var(--line);
+  transition: border-color 0.15s;
+}
+.compare-cards .card:hover {
+  border-color: var(--accent);
+}
+.compare-cards h3 {
+  font-size: 1.1rem;
+  margin: 0;
+}
+.compare-cards p {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 14px;
+  flex: 1;
+}
+.compare-cards .more {
+  color: var(--accent);
+  font-weight: 600;
+  font-size: 14px;
+}
+.site-foot {
+  border-top: 1px solid var(--line);
+}
+.foot-grid {
+  display: grid;
+  grid-template-columns: 1.4fr repeat(3, minmax(0, 1fr));
+  gap: 24px;
+}
+.foot-grid nav {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.foot-grid h4 {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  margin: 0 0 4px;
+}
+.foot-grid nav a {
+  color: var(--ink-2);
+  text-decoration: none;
+  font-size: 14px;
+}
+.foot-grid nav a:hover {
+  color: var(--accent);
+}
+
+/* Narrow screens (after the base rules above, so these win). */
+@media (max-width: 860px) {
+  .compare-cards,
+  .foot-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 560px) {
+  .compare-cards,
+  .foot-grid {
+    grid-template-columns: minmax(0, 1fr);
   }
 }

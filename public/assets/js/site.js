@@ -1,8 +1,12 @@
-// Landing page payback calculator.
+// Marketing site: marks the current page in the nav, runs the payback calculator.
 
 import { $, applyTheme, money } from './lib.js';
 
 applyTheme();
+for (const a of document.querySelectorAll('.site-nav nav a')) {
+  const path = new URL(a.href).pathname;
+  if (path !== '/' && (location.pathname === path || location.pathname.startsWith(`${path}/`))) a.setAttribute('aria-current', 'page');
+}
 const PRICE_CENTS = 100000;
 
 function update() {

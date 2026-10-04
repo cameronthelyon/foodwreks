@@ -35,6 +35,7 @@ lib/
   routes/                 pages, public, auth, staff, integrations, google, admin
 public/
   *.html                  page templates ({{PLACEHOLDERS}} filled server-side, escaped)
+  site/                   marketing site: layout.html plus one content file per page (routes and metadata in lib/routes/site.js)
   assets/js/              vanilla ES modules: booking, manage, waitlist, auth, admin, app/*
   assets/css/             design tokens (light + dark), app, booking, marketing
 test/                     node:test suites over real HTTP with a fake clock and fake fetch
@@ -98,7 +99,7 @@ All idempotent and safe to run late or twice.
 
 ## Testing
 
-`npm test` runs 89 tests in under 4 seconds: the availability engine (DST, overlap, pacing, combos, repack, spillover), every HTTP flow (booking, manage, staff, roles, isolation, CSRF), imports and exports, reports, notifications (providers, retries, reminders), integrations (Stripe, Toast, Square, Clover, Google) with every outbound call faked, and page rendering. Tests use a fake clock, an in-memory database, and a recorded fake `fetch`. No test touches the network. `test/regressions.test.js` holds one test per bug found in review, each shown to fail before its fix.
+`npm test` runs 92 tests in under 4 seconds: the availability engine (DST, overlap, pacing, combos, repack, spillover), every HTTP flow (booking, manage, staff, roles, isolation, CSRF), imports and exports, reports, notifications (providers, retries, reminders), integrations (Stripe, Toast, Square, Clover, Google) with every outbound call faked, and page rendering. Tests use a fake clock, an in-memory database, and a recorded fake `fetch`. No test touches the network. `test/regressions.test.js` holds one test per bug found in review, each shown to fail before its fix.
 
 ## Known limits
 

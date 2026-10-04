@@ -1,28 +1,3 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{{BRAND}}: reservations restaurants own</title>
-  <meta name="description" content="Reservation software for independent restaurants. Pay $1,000 once. No cover fees, no monthly rent. Your guests and your data stay yours.">
-  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="/assets/css/base.css">
-  <link rel="stylesheet" href="/assets/css/site.css">
-  <script type="module" src="/assets/js/site.js"></script>
-</head>
-<body>
-  <header class="site-nav">
-    <a class="logo" href="/"><svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#1F4D3F"/><path d="M10 6h12v20l-6-4.6L10 26z" fill="#F6F2EA"/></svg>{{BRAND}}</a>
-    <nav>
-      <a href="#how">How it works</a>
-      <a href="#cost">Cost</a>
-      <a href="#faq">Questions</a>
-      <a href="/login">Log in</a>
-      <a class="btn primary small" href="/signup">Start free trial</a>
-    </nav>
-  </header>
-
-  <main>
     <section class="hero">
       <div class="hero-copy">
         <p class="eyebrow">Reservations for independent restaurants</p>
@@ -51,7 +26,7 @@
       <div class="wrap three">
         <div><h3>No toll on your own regulars</h3><p>Per-cover platforms charge you when your own guests book you through them, including bookings that started on Google. Here, a cover costs nothing.</p></div>
         <div><h3>Your guests stay yours</h3><p>Every name, note, allergy and visit lives in your book. Export all of it any day, in one click. No network sells your diners to the place down the street.</p></div>
-        <div><h3>Built to last, not to flip</h3><p>Open source under the AGPL and owned by the restaurants that use it, as a cooperative. If we ever stopped, your data and the software would still be yours to keep running.</p></div>
+        <div><h3>Built to last, not to flip</h3><p>Open source under the AGPL, and being formed as a cooperative owned by the restaurants that use it. If we ever stopped, your data and the software would still be yours to keep running. <a href="/co-op">How the co-op works</a></p></div>
       </div>
     </section>
 
@@ -77,7 +52,7 @@
     <section class="band" id="cost">
       <div class="wrap">
         <h2>What it costs you today</h2>
-        <p class="muted">Published plan prices, October 2026. Check each vendor for current pricing.</p>
+        <p class="muted">Published plan prices, checked October 2026. Check each vendor for current pricing. Side by side: <a href="/compare/opentable">OpenTable</a>, <a href="/compare/resy">Resy</a>, <a href="/compare/tock">Tock</a>, <a href="/compare/yelp">Yelp</a>.</p>
         <div class="table-wrap">
           <table class="data compare">
             <thead><tr><th>Platform</th><th>Monthly</th><th>Per cover</th><th>Year one*</th></tr></thead>
@@ -112,10 +87,10 @@
       <h2>The honest answers</h2>
       <details open><summary>Will I lose diners who find me on OpenTable or Resy?</summary><p>Some, possibly. Here is the plain version: most diners find a restaurant on Google Maps, Instagram or its own website, and OpenTable bills Google-sourced bookings at its network rate. {{BRAND}} puts your Reserve button on all three at no per-cover cost. If a large share of your covers truly come from people browsing a marketplace app, compare the bills before you leave, or run both for a month.</p></details>
       <details><summary>How can one payment cover "lifetime"?</summary><p>Because the software is built to be cheap to run: one modest server handles thousands of restaurants, there is no sales team, and nobody is waiting for a toll on every cover. Each license works like a small endowment for your share of hosting and upkeep. Texting is the exception, because carriers charge per message, so it is passed through at cost.</p></details>
-      <details><summary>What exactly does "lifetime" mean?</summary><p>One license per location, for as long as you operate it. It transfers if you sell the restaurant. Your data is exportable at any time, and the code is open source, so your book keeps working even in the worst case.</p></details>
+      <details><summary>What exactly does "lifetime" mean?</summary><p>One license per location, for as long as you operate it. It transfers if you sell the restaurant. Your data is exportable at any time, and the code is open source, so your book keeps working even in the worst case. <a href="/pricing#lifetime">The full definition</a></p></details>
       <details><summary>Do you take a cut of deposits or no-show fees?</summary><p>No. Card holds run on your own Stripe account and the money goes straight to you. We never touch it.</p></details>
       <details><summary>Does it work with my POS?</summary><p>Toast, Square and Clover connect read-only. We read closed checks to show spend per guest and to free tables when a check closes. We never write to your POS. Without a POS connection everything else works the same.</p></details>
-      <details><summary>Can I bring my history?</summary><p>Yes. Export guests and future reservations from your current system as CSV and import them. We map the columns automatically and never message your guests during an import.</p></details>
+      <details><summary>Can I bring my history?</summary><p>Yes. Export guests and future reservations from your current system as CSV and import them. We map the columns automatically and never message your guests during an import. <a href="/switch">The switching guide</a> walks through a cutover step by step.</p></details>
     </section>
 
     <section class="band cta">
@@ -125,13 +100,4 @@
         <a class="btn primary" href="/signup">Start your free trial</a>
       </div>
     </section>
-  </main>
-
-  <footer class="site-foot">
-    <div class="wrap row between">
-      <span class="muted small">{{BRAND}} · reservations restaurants own · <a href="{{SOURCE_URL}}" rel="noopener">open source (AGPL-3.0)</a></span>
-      <span class="small"><a href="/login">Log in</a> · <a href="mailto:{{SUPPORT_EMAIL}}">{{SUPPORT_EMAIL}}</a></span>
-    </div>
-  </footer>
-</body>
-</html>
+  

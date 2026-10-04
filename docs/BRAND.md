@@ -86,5 +86,7 @@ Every confirmation email and booking page ends with "Booked with Freeheld, reser
 - [ ] Buy freeheld.io; register freeheld.coop when the cooperative is formed
 - [x] License decided: AGPL-3.0 (LICENSE file, source link on every page)
 - [ ] Make the repository public (or a public mirror) before launch, so the AGPL source link works
-- [ ] Re-verify every competitor price on the landing page against vendor pages, with the date
+- [ ] Re-verify every competitor price and claim against vendor pages, with the date: home, /pricing, /compare and the four comparison pages (`public/site/`)
+- [ ] When the cooperative is formed, update the "being formed" wording on the home, /co-op and comparison pages
+- [ ] If the name ever changes, regenerate the link-preview image from `tools/og-image.html`
 - [ ] Set `BRAND_NAME` and `SUPPORT_EMAIL` in production
