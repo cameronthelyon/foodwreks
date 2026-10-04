@@ -599,26 +599,88 @@ async function messages(el) {
 
 // ---- No-show protection ---------------------------------------------------------------------
 
-function protection(el) {
+function protection(el, route) {
   const s = r().settings;
   const connected = r().stripeConnected;
+  const stripe = r().stripe || {};
+  const q = route?.query || new URLSearchParams();
+  const refresh = async () => {
+    await loadRestaurant();
+    protection(el);
+  };
+  const connectButton = h(
+    'button',
+    {
+      type: 'button',
+      class: 'btn primary',
+      onclick: (e) =>
+        busy(
+          e.target,
+          rApi('/integrations/stripe/authorize', { method: 'POST', body: {} })
+            .then((res) => (location.href = res.url))
+            .catch(toastError),
+        ),
+    },
+    connected ? 'Reconnect with Stripe' : 'Connect with Stripe',
+  );
+  const disconnect = h(
+    'button',
+    {
+      type: 'button',
+      class: 'btn danger small',
+      onclick: async () => {
+        if (!(await confirmDialog('Disconnect Stripe? New large parties will book without a card until you connect again. Cards already saved stay in your Stripe account.', { confirmLabel: 'Disconnect', danger: true }))) return;
+        try {
+          await rApi('/integrations/stripe', { method: 'DELETE' });
+          toast('Stripe disconnected', 'ok');
+          await refresh();
+        } catch (err) {
+          toastError(err);
+        }
+      },
+    },
+    'Disconnect',
+  );
   const keyForm = h(
     'form',
     {},
     field('Stripe restricted key', h('input', { name: 'secretKey', placeholder: 'rk_live_…', autocomplete: 'off' }), 'Create it in Stripe: Developers → API keys → Create restricted key.'),
-    h('button', { type: 'submit', class: 'btn' }, connected ? 'Replace key' : 'Connect Stripe'),
+    h(
+      'details',
+      { style: { marginBottom: '12px' } },
+      h('summary', { class: 'small' }, 'Which permissions does the key need?'),
+      h('ul', { class: 'small' }, h('li', {}, 'Customers: Write'), h('li', {}, 'Checkout Sessions: Write'), h('li', {}, 'SetupIntents: Write'), h('li', {}, 'PaymentIntents: Write'), h('li', {}, 'PaymentMethods: Read')),
+    ),
+    h('button', { type: 'submit', class: 'btn' }, connected && stripe.method === 'key' ? 'Replace key' : 'Use this key'),
   );
   keyForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     try {
       const res = await rApi('/integrations/stripe/connect', { method: 'POST', body: { secretKey: keyForm.elements.secretKey.value } });
       toast(`Stripe connected (${res.mode} mode)`, 'ok');
-      await loadRestaurant();
-      protection(el);
+      await refresh();
     } catch (err) {
       toastError(err);
     }
   });
+  const status = connected
+    ? h(
+        'p',
+        { class: 'row' },
+        h('span', { class: 'chip ok' }, stripe.method === 'connect' ? 'Stripe connected' : 'Stripe connected with a key'),
+        stripe.mode === 'test' ? h('span', { class: 'chip warn' }, 'Test mode: no real charges') : null,
+        can('owner') ? disconnect : null,
+      )
+    : h('p', {}, h('span', { class: 'chip' }, 'Not connected'));
+  const ownerControls = !can('owner')
+    ? h('p', { class: 'muted small' }, 'Only an owner can connect Stripe.')
+    : stripe.connectAvailable
+      ? [
+          h('div', { class: 'row' }, connectButton),
+          h('p', { class: 'small muted' }, 'Sign in to your Stripe account, or create one, and approve. Takes about two minutes.'),
+          h('details', {}, h('summary', { class: 'small' }, 'Prefer to paste a restricted key?'), keyForm),
+        ]
+      : keyForm;
   const rulesForm = h(
     'form',
     {},
@@ -633,17 +695,13 @@ function protection(el) {
   });
   clear(
     el,
+    q.get('connected') ? h('p', { class: 'notice ok' }, 'Stripe connected. Large parties now save a card when they book.') : null,
+    q.get('error') ? h('p', { class: 'notice danger' }, q.get('error')) : null,
     panel(
       'Card holds on your own Stripe account',
       h('p', {}, 'Guests save a card on a secure Stripe page. Nothing is charged unless you mark a no-show and press charge. Money goes straight to your Stripe account. We never take a cut.'),
-      h('p', {}, connected ? h('span', { class: 'chip ok' }, 'Stripe connected') : h('span', { class: 'chip' }, 'Not connected')),
-      h(
-        'details',
-        {},
-        h('summary', {}, 'Which permissions does the restricted key need?'),
-        h('ul', { class: 'small' }, h('li', {}, 'Customers: Write'), h('li', {}, 'Checkout Sessions: Write'), h('li', {}, 'SetupIntents: Write'), h('li', {}, 'PaymentIntents: Write'), h('li', {}, 'PaymentMethods: Read')),
-      ),
-      can('owner') ? keyForm : h('p', { class: 'muted small' }, 'Only an owner can connect Stripe.'),
+      status,
+      ownerControls,
     ),
     panel('Rules', rulesForm, !connected ? h('p', { class: 'small muted' }, 'Until Stripe is connected, bookings go through without a card.') : null),
   );

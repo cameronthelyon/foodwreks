@@ -8,6 +8,7 @@ A READ-DO checklist. About an hour, most of it waiting for DNS. You need: the Di
 | `update.sh` | Release a new version: pull, test, restart, roll back on failure. |
 | `admin.sh` | Make someone a platform admin and print their set-password link. |
 | `litestream.yml` | Continuous off-site backup of the database. |
+| `STRIPE.md` | Stripe: license payments and Connect for restaurants' card holds. |
 
 ## 0. Before you start
 

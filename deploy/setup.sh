@@ -80,9 +80,11 @@ EMAIL_FROM="Freeheld <reservations@$DOMAIN>"
 # Texting stays off until a restaurant needs it (docs/INTEGRATIONS.md).
 SMS_PROVIDER=none
 
-# License payments (docs/INTEGRATIONS.md):
+# Stripe: license payments and Connect for restaurants (deploy/STRIPE.md):
 # PLATFORM_STRIPE_SECRET_KEY=
 # PLATFORM_STRIPE_WEBHOOK_SECRET=
+# STRIPE_CONNECT_CLIENT_ID=
+# STRIPE_CONNECT_WEBHOOK_SECRET=
 EOF
   chown root:freeheld "$ENV_FILE"
   chmod 640 "$ENV_FILE"

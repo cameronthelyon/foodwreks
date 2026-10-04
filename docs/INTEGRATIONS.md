@@ -10,7 +10,7 @@ Every integration is optional. A restaurant can run on the booking page, host st
 | Toast (read-only) | Yes | Yes | **No** | Restaurant creates Standard API access credentials |
 | Square (read-only) | Yes | Yes | **No** | Platform registers a Square app; webhook subscription |
 | Clover (read-only) | Yes | Yes | **No** | Approved Clover App Market app for production |
-| Stripe card holds (restaurant's account) | Yes | Yes | **No** | Restaurant's restricted key |
+| Stripe card holds (restaurant's account) | Yes | Yes | **No** | Connect with Stripe (one click), or a restricted key |
 | Stripe license payments (platform) | Yes | Yes | **No** | Platform Stripe account and webhook |
 | Google Actions Center end-to-end | Yes | Yes | **No** | Partner approval, sandbox review, SFTP feeds, service account |
 | Email (Postmark or Resend) | Yes | Yes | **No** | Account and verified sending domain |
@@ -63,7 +63,8 @@ Lightspeed K-Series has a solid closed-sales API (`/f/v2/business-location/{id}/
 
 ### Card holds and no-show fees (the restaurant's own account)
 
-- The restaurant creates a **restricted key** in Stripe (Developers → API keys) with: Customers write, Checkout Sessions write, SetupIntents write, PaymentIntents write, PaymentMethods read. Paste it in Settings → No-show protection. It is stored encrypted (AES-256-GCM).
+- **Connect with Stripe (preferred):** the owner clicks it in Settings → No-show protection, signs in to (or creates) their Stripe account and approves. We store only the account id (`acct_…`) and act on it with the platform key and the `Stripe-Account` header. Disconnecting deauthorizes on Stripe's side too; a restaurant revoking access from Stripe arrives as `account.application.deauthorized` and removes the link. Platform setup: `deploy/STRIPE.md`.
+- **Fallback:** a **restricted key** (Developers → API keys) with: Customers write, Checkout Sessions write, SetupIntents write, PaymentIntents write, PaymentMethods read, pasted in the same screen. Stored encrypted (AES-256-GCM).
 - **Flow:** a party at or above the card threshold books → the reservation is "pending" and holds the table → the diner saves a card on a Stripe-hosted Checkout page (setup mode, nothing charged) → on return we confirm the session with Stripe and the booking becomes "booked" (confirmation sent). Unfinished holds release after 20 minutes.
 - **No-show fee:** a manager marks the no-show, then presses Charge. One off-session PaymentIntent with an idempotency key, so a double click cannot double-charge.
 - **Money goes to the restaurant's Stripe account. We take nothing.** (OpenTable takes a 2% service fee on these since 2025.)
