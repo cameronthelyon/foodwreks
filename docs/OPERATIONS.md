@@ -6,7 +6,9 @@ The franchise prototype: every recurring job written down so that someone other 
 
 ## 1. Deploy a production server
 
-**Target:** one small Linux VM (2 vCPU, 2-4 GB RAM, SSD), Node.js 22.13+ (current LTS preferred), and a reverse proxy for TLS. Docker also works (see `Dockerfile`).
+**Target:** one small Linux VM (2 GB RAM is plenty to start), Node.js 22.13+, and a reverse proxy for TLS.
+
+**The fast path:** `deploy/README.md` creates a DigitalOcean droplet with `deploy/setup.sh`, which does every step below automatically. The manual list stays here as the reference for any other host. Docker also works (see `Dockerfile`).
 
 - [ ] Create a non-root user `freeheld`; clone the repository to `/opt/freeheld`
 - [ ] Create `/opt/freeheld/.env` from `.env.example`. Set at minimum: `NODE_ENV=production`, `BASE_URL=https://freeheld.io`, `APP_SECRET` (`openssl rand -base64 48`), `DATABASE_PATH=/var/lib/freeheld/freeheld.db`, `TRUST_PROXY=1`, `BRAND_NAME`, `SUPPORT_EMAIL=info@freeheld.io`, `SOURCE_URL` (public repository of the exact code deployed; the AGPL requires it)
@@ -19,9 +21,9 @@ The franchise prototype: every recurring job written down so that someone other 
 - [ ] Install the systemd unit below; `systemctl enable --now freeheld`
 - [ ] Put Caddy (or nginx) in front for TLS (Caddyfile below)
 - [ ] Check `https://freeheld.io/healthz` returns `{"ok":true}`
-- [ ] Sign up the first account, then make it a platform admin: `sqlite3 /var/lib/freeheld/freeheld.db "UPDATE users SET is_platform_admin = 1 WHERE email = 'you@example.org'"`
+- [ ] Create the first platform admin: `node scripts/create-admin.js you@freeheld.io` (prints a one-time set-password link; on a `setup.sh` server use `deploy/admin.sh`)
 - [ ] Set up off-box backups (section 4) and **run a restore drill (section 5) before the first restaurant goes live**
-- [ ] Optional: `SIGNUPS_OPEN=0` during pilots, creating accounts by invitation
+- [ ] Optional: `SIGNUPS_OPEN=0` during pilots; create each restaurant from the admin page (New restaurant), which invites the owner
 
 ```ini
 # /etc/systemd/system/freeheld.service
@@ -66,10 +68,10 @@ Server-sent events need proxy buffering off. Caddy streams by default; for nginx
 - [ ] Read the diff for migrations (`lib/db.js` MIGRATIONS). New migrations only append; never edit a shipped one
 - [ ] Take a manual backup first: `sqlite3 /var/lib/freeheld/freeheld.db ".backup /var/lib/freeheld/pre-release.db"`
 - [ ] Deploy outside service hours (mid-afternoon, never 5 to 9 PM local)
-- [ ] `git pull && systemctl restart freeheld`
+- [ ] `sudo /opt/freeheld/deploy/update.sh` (pulls, runs the tests, restarts, rolls back the code by itself if tests fail or the server does not answer; a migration that already ran needs the backup above)
 - [ ] `/healthz` is OK; log in; open one restaurant's Book and Floor views; load one booking page
 - [ ] Watch logs for 10 minutes: `journalctl -u freeheld -f`
-- [ ] If anything is wrong: `git checkout <previous tag>`, restore `pre-release.db` if a migration ran, restart
+- [ ] If anything is wrong after that: `git -C /opt/freeheld checkout -B main <previous commit>`, restore `pre-release.db` if a migration ran, restart
 
 ---
 
@@ -107,7 +109,7 @@ The server writes a consistent snapshot every `BACKUP_INTERVAL_HOURS` (default 2
 ## 6. Onboard a restaurant (one 60-minute call)
 
 Before the call:
-- [ ] Owner has signed up (or you created the account with `SIGNUPS_OPEN=0`)
+- [ ] Owner has signed up, or (with `SIGNUPS_OPEN=0`) you created the restaurant from the admin page and they accepted the invite
 - [ ] Ask them to export from their current system: guest list CSV and upcoming reservations CSV
 
 On the call (share their screen):

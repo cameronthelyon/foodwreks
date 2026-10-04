@@ -326,3 +326,24 @@ test('platform admin manages licenses; others cannot see admin routes', async ()
   assert.equal(r.license.kind, 'lifetime');
   assert.equal(r.license.active, true);
 });
+
+test('admins can create a restaurant and invite its owner when sign-ups are closed', async () => {
+  const { c, rid } = await signup(t);
+  const body = { restaurantName: 'Pilot Bistro', ownerEmail: 'owner@pilot.test', ownerName: 'Pat Pilot', timezone: 'America/Chicago' };
+  assert.equal((await c.post('/api/admin/restaurants', body)).status, 404, 'not for ordinary owners');
+  t.app.db.run('UPDATE users SET is_platform_admin = 1 WHERE id = (SELECT user_id FROM memberships WHERE restaurant_id = ?)', rid);
+  const made = await c.post('/api/admin/restaurants', body);
+  assert.equal(made.status, 200);
+  assert.match(made.data.inviteLink, /\/reset\?token=.+&invite=1$/);
+  const r = t.app.db.one('SELECT * FROM restaurants WHERE id = ?', made.data.restaurantId);
+  assert.equal(r.timezone, 'America/Chicago');
+  assert.equal(r.email, 'owner@pilot.test', 'guest replies reach the owner from day one');
+  assert.ok(t.app.db.one('SELECT count(*) AS n FROM tables WHERE restaurant_id = ?', r.id).n > 0, 'starter floor plan');
+  // The invitee sets a password from the link and lands as owner.
+  const token = new URL(made.data.inviteLink).searchParams.get('token');
+  const owner = t.client();
+  assert.equal((await owner.post('/api/auth/reset', { token, password: 'pilot-password-123' })).status, 200);
+  const me = await owner.post('/api/auth/login', { email: 'owner@pilot.test', password: 'pilot-password-123' });
+  assert.equal(me.data.memberships[0].role, 'owner');
+  assert.equal(t.app.db.one("SELECT count(*) AS n FROM outbox WHERE recipient = 'owner@pilot.test' AND kind = 'staff_invite'").n, 1);
+});

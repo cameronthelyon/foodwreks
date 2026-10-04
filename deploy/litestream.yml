@@ -1,0 +1,15 @@
+# Continuous replication of the database to S3-compatible storage
+# (DigitalOcean Spaces, Backblaze B2, AWS S3). Values come from
+# /etc/freeheld/litestream.env. Restore: deploy/README.md.
+dbs:
+  - path: /var/lib/freeheld/freeheld.db
+    replicas:
+      - type: s3
+        bucket: ${LITESTREAM_BUCKET}
+        path: freeheld.db
+        endpoint: ${LITESTREAM_ENDPOINT}
+        region: ${LITESTREAM_REGION}
+        access-key-id: ${LITESTREAM_ACCESS_KEY_ID}
+        secret-access-key: ${LITESTREAM_SECRET_ACCESS_KEY}
+        # Keep 30 days of history to restore to any point in it.
+        retention: 720h
