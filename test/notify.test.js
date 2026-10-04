@@ -138,3 +138,30 @@ test('stale seated parties are closed out; backups rotate', async () => {
     await t.close();
   }
 });
+
+test('guests see the restaurant as the sender, and their replies reach the restaurant', async () => {
+  const t = await startTestApp({ env: { EMAIL_PROVIDER: 'postmark', POSTMARK_TOKEN: 'tok', EMAIL_FROM: 'Freeheld <reservations@freeheld.io>', SUPPORT_EMAIL: 'info@freeheld.io' } });
+  t.routes.push({ match: (u) => u.includes('postmarkapp'), reply: () => jsonResponse({ MessageID: 'ok', ErrorCode: 0 }) });
+  try {
+    const { c, rid, email } = await signup(t, { restaurantName: 'Juniper & Rye' });
+    await c.patch(`/api/r/${rid}/settings`, { staffAlertEmail: 'manager@juniper.test' });
+    t.app.db.run('DELETE FROM outbox');
+    t.outbound.length = 0;
+    await c.post(`/api/public/r/${(await c.get(`/api/r/${rid}`)).data.slug}/reservations`, {
+      date: '2026-10-16', time: 1140, partySize: 2, firstName: 'Ada', phone: '4155550111', email: 'ada@guest.test', policyAccepted: true,
+    });
+    await c.post('/api/auth/forgot', { email });
+    await t.app.notify.processOutbox();
+    const sent = t.outbound.filter((o) => o.url.includes('postmarkapp')).map((o) => JSON.parse(o.body));
+    const guest = sent.find((m) => m.To === 'ada@guest.test');
+    assert.equal(guest.From, '"Juniper & Rye via Freeheld" <reservations@freeheld.io>');
+    assert.equal(guest.ReplyTo, email, 'replies go to the restaurant (its email defaults to the owner\'s)');
+    const alert = sent.find((m) => m.To === 'manager@juniper.test');
+    assert.equal(alert.ReplyTo, 'ada@guest.test', 'staff can answer the guest directly');
+    const reset = sent.find((m) => m.To === email);
+    assert.equal(reset.From, 'Freeheld <reservations@freeheld.io>');
+    assert.equal(reset.ReplyTo, 'info@freeheld.io');
+  } finally {
+    await t.close();
+  }
+});

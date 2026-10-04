@@ -110,7 +110,7 @@ Google's AI Mode books restaurants through named partners (OpenTable, Resy, Tock
 | Console (dev) | `EMAIL_PROVIDER=console` | Prints instead of sending |
 | Twilio | `SMS_PROVIDER=twilio`, SID, token, `TWILIO_FROM` or `TWILIO_MESSAGING_SERVICE_SID` | $0.0083/segment + carrier fees ≈ $0.0126 |
 
-Verify a sending domain (SPF, DKIM, DMARC) before going live, or confirmations land in spam.
+Verify the sending domain (SPF, DKIM, DMARC) before going live, or confirmations land in spam. Production sends from `reservations@freeheld.io`; guest emails show the restaurant's name as the sender ("Juniper & Rye via Freeheld") and set Reply-To to the restaurant's email, so guests' replies reach the restaurant. Staff alerts reply to the guest; account emails reply to `info@freeheld.io`.
 
 **Text message compliance is the hard part.** US carriers require application-to-person registration:
 

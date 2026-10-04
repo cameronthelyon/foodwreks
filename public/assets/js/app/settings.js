@@ -156,7 +156,7 @@ function profile(el) {
     panel(
       'Restaurant',
       field('Name', h('input', { name: 'name', value: x.name, required: true })),
-      h('div', { class: 'grid-2' }, field('Phone', h('input', { name: 'phone', type: 'tel', value: x.phone })), field('Email', h('input', { name: 'email', type: 'email', value: x.email }))),
+      h('div', { class: 'grid-2' }, field('Phone', h('input', { name: 'phone', type: 'tel', value: x.phone })), field('Email', h('input', { name: 'email', type: 'email', value: x.email }), 'Guests who reply to a confirmation or reminder reach this address.')),
       field('Website', h('input', { name: 'website', type: 'url', value: x.website, placeholder: 'https://' })),
       field('Street address', h('input', { name: 'address', value: x.address })),
       h('div', { class: 'grid-3' }, field('City', h('input', { name: 'city', value: x.city })), field('State', h('input', { name: 'region', value: x.region })), field('ZIP', h('input', { name: 'postalCode', value: x.postalCode }))),

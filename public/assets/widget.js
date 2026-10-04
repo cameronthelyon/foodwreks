@@ -1,8 +1,8 @@
 /*
  * Booking widget for a restaurant's own website.
  *
- *   <a href="https://YOUR-HOST/r/your-slug" data-freeheld-widget>Reserve a table</a>
- *   <script src="https://YOUR-HOST/widget.js" data-restaurant="your-slug" async></script>
+ *   <a href="https://freeheld.io/r/your-slug" data-freeheld-widget>Reserve a table</a>
+ *   <script src="https://freeheld.io/widget.js" data-restaurant="your-slug" async></script>
  *
  * The link is plain HTML on purpose: it works without JavaScript, and it is
  * a real link search engines can follow to the restaurant's booking page.

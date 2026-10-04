@@ -9,13 +9,16 @@ The franchise prototype: every recurring job written down so that someone other 
 **Target:** one small Linux VM (2 vCPU, 2-4 GB RAM, SSD), Node.js 22.13+ (current LTS preferred), and a reverse proxy for TLS. Docker also works (see `Dockerfile`).
 
 - [ ] Create a non-root user `freeheld`; clone the repository to `/opt/freeheld`
-- [ ] Create `/opt/freeheld/.env` from `.env.example`. Set at minimum: `NODE_ENV=production`, `BASE_URL=https://your-domain`, `APP_SECRET` (`openssl rand -base64 48`), `DATABASE_PATH=/var/lib/freeheld/freeheld.db`, `TRUST_PROXY=1`, `BRAND_NAME`, `SUPPORT_EMAIL`, `SOURCE_URL` (public repository of the exact code deployed; the AGPL requires it)
+- [ ] Create `/opt/freeheld/.env` from `.env.example`. Set at minimum: `NODE_ENV=production`, `BASE_URL=https://freeheld.io`, `APP_SECRET` (`openssl rand -base64 48`), `DATABASE_PATH=/var/lib/freeheld/freeheld.db`, `TRUST_PROXY=1`, `BRAND_NAME`, `SUPPORT_EMAIL=info@freeheld.io`, `SOURCE_URL` (public repository of the exact code deployed; the AGPL requires it)
 - [ ] **Store `APP_SECRET` in your password manager.** Losing it makes integration credentials unreadable and invalidates every manage link and session
-- [ ] Set email: `EMAIL_PROVIDER`, its key, and an `EMAIL_FROM` on a domain with SPF, DKIM and DMARC records
+- [ ] Set email: `EMAIL_PROVIDER`, its key, and `EMAIL_FROM=Freeheld <reservations@freeheld.io>`
+- [ ] DNS for freeheld.io email, from the provider's domain page: the DKIM TXT record, the Return-Path CNAME, and an SPF record if the provider asks for one. Add DMARC: `_dmarc.freeheld.io TXT "v=DMARC1; p=none; rua=mailto:info@freeheld.io"`, then move to `p=quarantine` after two clean weeks of reports
+- [ ] Check that info@freeheld.io receives mail (it is the support address, the Reply-To on account emails, and where DMARC reports land)
+- [ ] Send a test confirmation to a Gmail and an Outlook address. Both arrive in the inbox, the sender reads "Restaurant via Freeheld", and replying addresses the restaurant
 - [ ] `mkdir -p /var/lib/freeheld && chown freeheld /var/lib/freeheld`
 - [ ] Install the systemd unit below; `systemctl enable --now freeheld`
 - [ ] Put Caddy (or nginx) in front for TLS (Caddyfile below)
-- [ ] Check `https://your-domain/healthz` returns `{"ok":true}`
+- [ ] Check `https://freeheld.io/healthz` returns `{"ok":true}`
 - [ ] Sign up the first account, then make it a platform admin: `sqlite3 /var/lib/freeheld/freeheld.db "UPDATE users SET is_platform_admin = 1 WHERE email = 'you@example.org'"`
 - [ ] Set up off-box backups (section 4) and **run a restore drill (section 5) before the first restaurant goes live**
 - [ ] Optional: `SIGNUPS_OPEN=0` during pilots, creating accounts by invitation
@@ -43,8 +46,13 @@ WantedBy=multi-user.target
 
 ```
 # /etc/caddy/Caddyfile
-your-domain.org {
+freeheld.io {
   reverse_proxy 127.0.0.1:3000
+}
+
+# One canonical address for search engines.
+www.freeheld.io {
+  redir https://freeheld.io{uri} permanent
 }
 ```
 
